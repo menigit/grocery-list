@@ -9,260 +9,237 @@
     <!-- #####################################   Style   ##################################### -->
     <!-- ##################################################################################### -->
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-            background: #1a1a1a;
-            color: #e0e0e0;
+            background: #fdf6f0;
+            color: #333;
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
         }
 
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
+        .container { max-width: 500px; margin: 0 auto; }
 
         .header {
-            background: #252525;
+            background: #fff8f2;
             padding: 15px;
             position: sticky;
             top: 0;
             z-index: 10;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #e0dcdc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .header h1 {
             margin: 0 0 15px 0;
             font-size: 24px;
             text-align: center;
+            color: #6b4c3b;
         }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
-        }
+        .tabs { display:flex; gap:10px; }
 
         .tab-btn {
-            flex: 1;
-            padding: 10px;
-            background: #2a2a2a;
+            flex:1;
+            padding:10px;
+            background: #ffe6d9;
             border: none;
             border-radius: 8px;
-            color: #fff;
             cursor: pointer;
             font-size: 15px;
+            color: #6b4c3b;
+            transition: 0.2s;
         }
 
         .tab-btn.active {
-            background: #4a4a4a;
+            background: #ffd4b5;
             font-weight: bold;
         }
 
-        .content {
-            padding: 10px;
-        }
+        .content { padding: 10px; }
 
-        .category-group {
-            margin-bottom: 20px;
-        }
+        .category-group { margin-bottom:20px; }
 
         .category-header {
-            padding: 8px 12px;
+            padding:8px 12px;
             border-radius: 6px;
             margin-bottom: 5px;
             font-weight: bold;
-            font-size: 14px;
+            font-size:14px;
+            color: #fff;
         }
 
         .product-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            background: #2a2a2a;
-            margin-bottom: 3px;
-            border-radius: 6px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:10px 12px;
+            background: #fff0ea;
+            margin-bottom:3px;
+            border-radius:6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .product-item.inactive {
-            opacity: 0.5;
-            background: #222;
-        }
+        .product-item.inactive { opacity:0.6; }
 
         .product-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: #4a9eff;
+            width:20px;
+            height:20px;
+            cursor:pointer;
+            accent-color: #82c0ff;
         }
 
-        .product-name {
-            flex: 1;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .urgent-icon {
-            color: #ffa500;
-            font-size: 16px;
-        }
+        .product-name { flex:1; font-size:15px; display:flex; align-items:center; gap:6px; }
 
         .edit-btn {
             background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-            color: #888;
-            font-size: 18px;
+            border:none;
+            cursor:pointer;
+            padding:2px;
+            font-size:120px;
+            display:flex;
+            align-items:center;
+        }
+
+        .edit-btn svg {
+            color: #6b4c3b;
+            width: 20px;
+            height: 20px;
         }
 
         .bottom-actions {
             position: fixed;
-            bottom: 0;
-            left: 50%;
+            bottom:0;
+            left:50%;
             transform: translateX(-50%);
-            max-width: 500px;
-            width: 100%;
-            background: #252525;
-            padding: 15px;
-            border-top: 1px solid #333;
-            display: flex;
-            gap: 10px;
+            max-width:500px;
+            width:100%;
+            background: #fff8f2;
+            padding:15px;
+            border-top:1px solid #e0dcdc;
+            display:flex;
+            gap:10px;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
         }
 
         .action-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
+            flex:1;
+            padding:12px;
+            border:none;
+            border-radius:8px;
+            background: #B87C4C;
             color: #fff;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            cursor:pointer;
+            font-size:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:6px;
+            transition: 0.2s;
         }
 
-        .btn-create { background: #2e7d32; }
-        .btn-permanent { background: #1565c0; }
-        .btn-search { background: #6a1b9a; }
+        .action-btn:hover { background: #E2A16F; }
+
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
+            margin-left: 2px;
+        }
 
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.3);
             display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 1000;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            z-index:1000;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display:flex; }
 
         .modal {
-            background: #2a2a2a;
-            border-radius: 12px;
-            padding: 20px;
-            width: 100%;
-            max-width: 400px;
-            max-height: 90vh;
-            overflow: auto;
+            background:#fff;
+            border-radius:12px;
+            padding:20px;
+            width:100%;
+            max-width:400px;
+            max-height:90vh;
+            overflow:auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        .modal h2 {
-            margin: 0 0 20px 0;
-            font-size: 20px;
+        .modal h2 { margin:0 0 20px 0; font-size:20px; color:#6b4c3b; }
+
+        .form-group { margin-bottom:15px; }
+
+        .form-group label { display:block; margin-bottom:5px; font-size:14px; color:#6b4c3b; }
+
+        .form-group input[type="text"], .form-group select {
+            width:100%;
+            padding:10px;
+            background: #fff0ea;
+            border:1px solid #e0dcdc;
+            border-radius:6px;
+            color:#6b4c3b;
+            font-size:15px;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+        .checkbox-label { display:flex; align-items:center; gap:8px; cursor:pointer; color:#6b4c3b; }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        .form-group input[type="text"],
-        .form-group select {
-            width: 100%;
-            padding: 10px;
-            background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 15px;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .checkbox-label input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        .modal-actions { display:flex; gap:10px; margin-top:20px; }
 
         .modal-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-            font-size: 15px;
+            flex:1;
+            padding:12px;
+            border:none;
+            border-radius:8px;
+            color:#fff;
+            cursor:pointer;
+            font-size:15px;
         }
 
-        .btn-save { background: #2e7d32; font-weight: bold; }
-        .btn-delete { background: #c62828; font-weight: bold; }
-        .btn-cancel { background: #555; }
+        .btn-save { background:#82c0ff; font-weight:bold; }
+        .btn-delete { background:#ff7a7a; font-weight:bold; }
+        .btn-cancel { background:#b0b0b0; }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
-        }
-
-        .search-results {
-            max-height: 400px;
-            overflow: auto;
-            margin: 15px 0;
-        }
+        .empty-state { text-align:center; padding:40px 20px; color:#a67c63; }
 
         .status-badge {
-            font-size: 12px;
-            padding: 3px 8px;
-            border-radius: 4px;
+            font-size:12px;
+            padding:3px 8px;
+            border-radius:4px;
         }
 
-        .status-active { background: #2e7d32; }
-        .status-inactive { background: #555; }
+        .status-active { background:#82c0ff; color:#fff; }
+        .status-inactive { background:#b0b0b0; color:#fff; }
     </style>
 </head>
 <body>
+    <svg style="display:none;">
+        <symbol id="icon-circle-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12h8"/>
+            <path d="M12 8v8"/>
+        </symbol>
+        <symbol id="icon-repeat2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 9 3-3 3 3"/>
+            <path d="M13 18H7a2 2 0 0 1-2-2V6"/>
+            <path d="m22 15-3 3-3-3"/>
+            <path d="M11 6h6a2 2 0 0 1 2 2v10"/>
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21 21-4.34-4.34"/>
+            <circle cx="11" cy="11" r="8"/>
+        </symbol>
+        <symbol id="icon-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+            <path d="m15 5 4 4"/>
+        </symbol>
+    </svg>
+
     <!-- ##################################################################################### -->
     <!-- #####################################   Body    ##################################### -->
     <!-- ##################################################################################### -->
@@ -282,14 +259,14 @@
         <div class="content" id="products-list"></div>
 
         <div class="bottom-actions">
-            <button class="action-btn btn-create" onclick="openCreateModal()">
-                ➕ צור מוצר
+            <button class="action-btn" onclick="openCreateModal()">
+                <svg><use href="#icon-circle-plus"></use></svg> צור מוצר
             </button>
-            <button class="action-btn btn-permanent" onclick="loadPermanentProducts()">
-                🔄 טען קבועים
+            <button class="action-btn" onclick="loadPermanentProducts()">
+                <svg><use href="#icon-repeat2"></use></svg> טען קבועים
             </button>
-            <button class="action-btn btn-search" onclick="openSearchModal()">
-                🔍 חפש מוצר
+            <button class="action-btn" onclick="openSearchModal()">
+                <svg><use href="#icon-search"></use></svg> חפש מוצר
             </button>
         </div>
     </div>
@@ -356,15 +333,15 @@
     <!-- ##################################################################################### -->
     <script>
         const CATEGORIES = [
-            { id: 1, name: 'פירות וירקות', color: '#2d5016' },
-            { id: 2, name: 'מוצרי חלב וביצים', color: '#4a4a1a' },
-            { id: 3, name: 'טואלטיקה', color: '#1a4a4a' },
-            { id: 4, name: 'מזון יבש ושימורים', color: '#4a3a1a' },
-            { id: 5, name: 'בשר, עוף ודגים', color: '#4a1a1a' },
-            { id: 6, name: 'שתייה, ממתקים וחטיפים', color: '#3a1a4a' },
-            { id: 7, name: 'תבלינים ורטבים', color: '#4a2a1a' },
-            { id: 8, name: 'קפואים', color: '#1a3a4a' },
-            { id: 9, name: 'מאפים ודגנים', color: '#3a3a2a' }
+            { id: 1, name: 'פירות וירקות', color: '#B6CEB4' },
+            { id: 2, name: 'מוצרי חלב וביצים', color: '#9BB4C0' },
+            { id: 3, name: 'טואלטיקה', color: '#FFA4A4' },
+            { id: 4, name: 'מזון יבש ושימורים', color: '#A6AEBF' },
+            { id: 5, name: 'בשר, עוף ודגים', color: '#D57E7E' },
+            { id: 6, name: 'שתייה, ממתקים וחטיפים', color: '#898AC4' },
+            { id: 7, name: 'תבלינים ורטבים', color: '#FFD09B' },
+            { id: 8, name: 'קפואים', color: '#CB9DF0' },
+            { id: 9, name: 'מאפים ודגנים', color: '#CDC2A5' }
         ];
 
         let products = [];
@@ -427,7 +404,9 @@
                                         <span>${p.name}${p.quantity ? ` (${p.quantity})` : ''}</span>
                                         ${!p.isUrgent ? '<span class="urgent-icon">⚠️</span>' : ''}
                                     </div>
-                                    <button class="edit-btn" onclick="openEditModal(${p.id})">✏️</button>
+                                    <button class="edit-btn" onclick="openEditModal(${p.id})">
+                                        <svg><use href="#icon-pencil"></use></svg>
+                                        </button>
                                 </div>
                             `).join('')}
                         </div>
