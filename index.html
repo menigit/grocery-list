@@ -91,7 +91,7 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .product-item.inactive { opacity:0.6; }
+        .product-item.inactive { opacity:0.55; }
 
         .product-item input[type="checkbox"] {
             width:20px;
@@ -429,7 +429,7 @@
                                 <div class="category-line" style="background:${category.color}"></div>
                             </div>
                             ${items.map(p => `
-                                <div class="product-item ${p.isActive ? '' : 'inactive'}">
+                                <div class="product-item ${p.isActive && p.isUrgent ? '' : 'inactive'}">
                                     <input type="checkbox" ${p.isActive ? '' : 'checked'} 
                                            onchange="toggleActive(${p.id})" />
                                     <div class="product-name">
