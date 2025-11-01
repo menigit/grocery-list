@@ -252,14 +252,7 @@
 
         .empty-state { text-align:center; padding:40px 20px; color:#a67c63; }
 
-        .status-badge {
-            font-size:12px;
-            padding:3px 8px;
-            border-radius:4px;
-        }
-
-        .status-active { background:#82c0ff; color:#fff; }
-        .status-inactive { background:#b0b0b0; color:#fff; }
+        .search-results .product-item { padding: 6px 10px; }
     </style>
 </head>
 <body>
@@ -656,19 +649,21 @@
                 
                 return `
                     <div class="category-group">
-                        <div class="category-header" style="background:${category.color}">
-                            ${category.name}
+                        <div class="category-header">
+                            <span class="category-name">${category.name}</span>
+                            <div class="category-line" style="background:${category.color}"></div>
                         </div>
                         ${items.map(p => `
-                            <div class="product-item">
+                            <div class="product-item ${p.isActive && p.isUrgent ? '' : 'inactive'}">
                                 <input type="checkbox" ${p.isActive ? '' : 'checked'} 
                                        onchange="toggleActive(${p.id})" />
                                 <div class="product-name">
                                     ${p.name}${p.quantity ? ` (${p.quantity})` : ''}
                                 </div>
-                                <span class="status-badge ${p.isActive ? 'status-active' : 'status-inactive'}">
-                                    ${p.isActive ? 'פעיל' : 'לא פעיל'}
-                                </span>
+                                <div class="icon-group">
+                                    ${!p.isUrgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
+                                    ${p.isPermanent ? '<svg><use href="#icon-repeat2"></use></svg>' : ''}
+                                </div>
                             </div>
                         `).join('')}
                     </div>
