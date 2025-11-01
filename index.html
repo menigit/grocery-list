@@ -303,10 +303,6 @@
         <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>
         </symbol>
-        <symbol id="icon-moon-slash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>
-            <line x1="1" y1="3" x2="19" y2="23"/>
-          </symbol>
         <symbol id="icon-line" viewBox="0 0 2 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 2 2 22"></path>
@@ -383,9 +379,9 @@
 
             <div class="form-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="product-urgent" checked />
-                    <svg><use href="#icon-moon-slash"></use></svg>
-                    <span>- דחוף</span>
+                    <input type="checkbox" id="product-unurgent" />
+                    <svg><use href="#icon-moon"></use></svg>
+                    <span>- לא דחוף</span>
                 </label>
             </div>
 
@@ -495,16 +491,16 @@
                                 <div class="category-line" style="background:${category.color}"></div>
                             </div>
                             ${items.map(p => `
-                                <div class="product-item ${p.isActive && p.isUrgent ? '' : 'inactive'}">
+                                <div class="product-item ${p.isActive && !p.isUnurgent ? '' : 'inactive'}">
                                     <input type="checkbox" ${p.isActive ? '' : 'checked'} 
                                            onchange="toggleActive(${p.id})" />
                                     <div class="product-name">
                                         <span>${p.name}${p.quantity ? ` (${p.quantity})` : ''}</span>
                                     </div>
                                 <div class="icon-group">
-                                    ${!p.isUrgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
+                                    ${p.isUnurgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
                                     ${p.isPermanent ? '<svg><use href="#icon-repeat2"></use></svg>' : ''}
-                                    ${!p.isUrgent || p.isPermanent? '<svg id="iconLine"><use href="#icon-line"></use></svg>' : ''}
+                                    ${p.isUnurgent || p.isPermanent? '<svg id="iconLine"><use href="#icon-line"></use></svg>' : ''}
                                     <button class="edit-btn" onclick="openEditModal(${p.id})">
                                         <svg><use href="#icon-pencil"></use></svg>
                                     </button>
@@ -576,7 +572,7 @@
             document.getElementById('product-quantity').value = '';
             document.getElementById('product-category').value = '1';
             document.getElementById('product-permanent').checked = false;
-            document.getElementById('product-urgent').checked = true;
+            document.getElementById('product-unurgent').checked = false;
             document.getElementById('delete-btn').style.display = 'none';
             document.getElementById('edit-modal').classList.add('active');
         }
@@ -591,7 +587,7 @@
             document.getElementById('product-quantity').value = product.quantity || '';
             document.getElementById('product-category').value = product.category;
             document.getElementById('product-permanent').checked = product.isPermanent || false;
-            document.getElementById('product-urgent').checked = product.isUrgent;
+            document.getElementById('product-unurgent').checked = product.isUnurgent || false;
             document.getElementById('delete-btn').style.display = 'block';
             document.getElementById('edit-modal').classList.add('active');
         }
@@ -624,7 +620,7 @@
                 category: parseInt(document.getElementById('product-category').value),
                 isPermanent: document.getElementById('product-permanent').checked,
                 isActive: true,
-                isUrgent: document.getElementById('product-urgent').checked
+                isUnurgent: document.getElementById('product-unurgent').checked
             };
 
             if (editingProductId) {
@@ -700,14 +696,14 @@
                             <div class="category-line" style="background:${category.color}"></div>
                         </div>
                         ${items.map(p => `
-                            <div class="product-item ${p.isActive && p.isUrgent ? '' : 'inactive'}">
+                            <div class="product-item ${p.isActive && !p.isUnurgent ? '' : 'inactive'}">
                                 <input type="checkbox" ${p.isActive ? '' : 'checked'} 
                                        onchange="toggleActive(${p.id})" />
                                 <div class="product-name">
                                     ${p.name}${p.quantity ? ` (${p.quantity})` : ''}
                                 </div>
                                 <div class="icon-group">
-                                    ${!p.isUrgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
+                                    ${p.isUnurgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
                                     ${p.isPermanent ? '<svg><use href="#icon-repeat2"></use></svg>' : ''}
                                 </div>
                             </div>
