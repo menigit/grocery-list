@@ -168,7 +168,6 @@
         .action-btn svg {
             width: 20px;
             height: 20px;
-            margin-left: 2px;
         }
 
         .modal-overlay {
@@ -253,6 +252,31 @@
         .empty-state { text-align:center; padding:40px 20px; color:#a67c63; }
 
         .search-results .product-item { padding: 6px 10px; }
+
+        .action-btn.btn-more {
+            flex: 0;
+            padding: 4px;
+        }
+
+        .more-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .more-actions .modal-btn {
+            width: 120px;
+            display: block;
+            text-align: center;
+            font-size: 14px;
+            padding: 15px 0;
+        }
+
+        .more-actions .modal-btn.btn-cancel {
+            width: 100%;
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -287,6 +311,12 @@
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 2 2 22"></path>
         </symbol>
+        <symbol id="icon-more-vertical" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="5" r="1"/>
+            <circle cx="12" cy="12" r="1"/>
+            <circle cx="12" cy="19" r="1"/>
+        </symbol>
     </svg>
 
     <!-- ##################################################################################### -->
@@ -316,6 +346,9 @@
             </button>
             <button class="action-btn" onclick="openSearchModal()">
                 <svg><use href="#icon-search"></use></svg> חפש מוצר
+            </button>
+            <button class="action-btn btn-more" onclick="openMoreModal()">
+                <svg><use href="#icon-more-vertical"></use></svg>
             </button>
         </div>
     </div>
@@ -376,6 +409,19 @@
             <div class="search-results" id="search-results"></div>
 
             <button class="modal-btn btn-cancel" style="width:100%" onclick="closeSearchModal()">סגור</button>
+        </div>
+    </div>
+
+    <!-- More Modal -->
+    <div class="modal-overlay" id="more-modal">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2>עוד אפשרויות</h2>
+            <div class="modal-actions more-actions">
+                <button class="modal-btn action-btn" onclick="exportData()">ייצא נתונים</button>
+                <button class="modal-btn action-btn" onclick="importData()">ייבא נתונים</button>
+                <button class="modal-btn btn-delete" onclick="deleteAllData()">מחק הכל</button>
+                <button class="modal-btn btn-cancel" onclick="closeMoreModal()">ביטול</button>
+            </div>
         </div>
     </div>
 
@@ -671,9 +717,66 @@
             }).join('');
         }
 
+        function openMoreModal() {
+            document.getElementById('more-modal').classList.add('active');
+        }
+
+        function closeMoreModal() {
+            document.getElementById('more-modal').classList.remove('active');
+        }
+
+        function exportData() {
+            const data = JSON.stringify(products, null, 2);
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'shopping-list.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = event => {
+                try {
+                    const imported = JSON.parse(event.target.result);
+                    if (Array.isArray(imported)) {
+                    products = imported;
+                    saveToStorage();
+                    renderProducts();
+                    closeMoreModal();
+                    } else {
+                    alert('קובץ לא תקין');
+                    }
+                } catch {
+                    alert('קובץ לא תקין');
+                }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function deleteAllData() {
+            if (confirm('האם למחוק את כל הנתונים במאגר? פעולה זו לא ניתנת לביטול!')) {
+                products = [];
+                saveToStorage();
+                renderProducts();
+                closeMoreModal();
+            }
+        }
+
         // Close modals on overlay click
         document.getElementById('edit-modal').onclick = closeEditModal;
         document.getElementById('search-modal').onclick = closeSearchModal;
+        document.getElementById('more-modal').onclick = closeMoreModal;
 
         // Initialize app
         init();
