@@ -211,7 +211,28 @@
             font-size:15px;
         }
 
-        .checkbox-label { display:flex; align-items:center; gap:8px; cursor:pointer; color:#6b4c3b; }
+        .checkbox-label {
+            display:flex !important;
+            align-items:center;
+            justify-content:baseline;
+            gap:8px;
+            cursor:pointer;
+            color:#6b4c3b;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width:18px;
+            height:18px;
+            cursor:pointer;
+            accent-color: #82c0ff;
+        }
+
+        .checkbox-label svg {
+            width:16px;
+            height:16px;
+            margin-left: -2px;
+            color:#B87C4C;
+        }
 
         .modal-actions { display:flex; gap:10px; margin-top:20px; }
 
@@ -265,6 +286,10 @@
         <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>
         </symbol>
+        <symbol id="icon-moon-slash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>
+            <line x1="1" y1="3" x2="19" y2="23"/>
+          </symbol>
         <symbol id="icon-line" viewBox="0 0 2 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 2 2 22"></path>
@@ -325,14 +350,16 @@
             <div class="form-group">
                 <label class="checkbox-label">
                     <input type="checkbox" id="product-permanent" />
-                    <span>מוצר קבוע</span>
+                    <svg><use href="#icon-repeat2"></use></svg>
+                    <span>- מוצר קבוע</span>
                 </label>
             </div>
 
             <div class="form-group">
                 <label class="checkbox-label">
                     <input type="checkbox" id="product-urgent" checked />
-                    <span>דחוף</span>
+                    <svg><use href="#icon-moon-slash"></use></svg>
+                    <span>- דחוף</span>
                 </label>
             </div>
 
