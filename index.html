@@ -23,7 +23,7 @@
 
         .header {
             background: #fff8f2;
-            padding: 15px;
+            padding: 12px;
             position: sticky;
             top: 0;
             z-index: 10;
@@ -32,7 +32,7 @@
         }
 
         .header h1 {
-            margin: 0 0 15px 0;
+            margin: 0 0 10px 0;
             font-size: 24px;
             text-align: center;
             color: #6b4c3b;
@@ -59,22 +59,32 @@
 
         .content { padding: 10px; }
 
-        .category-group { margin-bottom:20px; }
+        .category-group { margin-bottom:10px; }
 
         .category-header {
-            padding:8px 12px;
-            border-radius: 6px;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size:14px;
-            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: .9rem;
+            margin-bottom: 2px;
+        }
+
+        .category-line {
+            width: 100%;
+            height: 2px;
+            border-radius: 2px;
         }
 
         .product-item {
             display:flex;
             align-items:center;
             gap:10px;
-            padding:10px 12px;
+            padding:4px 10px;
             background: #fff0ea;
             margin-bottom:3px;
             border-radius:6px;
@@ -130,7 +140,7 @@
             max-width:500px;
             width:100%;
             background: #fff8f2;
-            padding:15px;
+            padding:12px;
             border-top:1px solid #e0dcdc;
             display:flex;
             gap:10px;
@@ -356,8 +366,8 @@
         const CATEGORIES = [
             { id: 1, name: 'פירות וירקות', color: '#B6CEB4' },
             { id: 2, name: 'מוצרי חלב וביצים', color: '#9BB4C0' },
-            { id: 3, name: 'טואלטיקה', color: '#FFA4A4' },
-            { id: 4, name: 'מזון יבש ושימורים', color: '#A6AEBF' },
+            { id: 3, name: 'הגיינה, ניקוי ומוצרי בית', color: '#FFA4A4' },
+            { id: 4, name: 'מזון יבש, אפייה ושימורים', color: '#A6AEBF' },
             { id: 5, name: 'בשר, עוף ודגים', color: '#D57E7E' },
             { id: 6, name: 'שתייה, ממתקים וחטיפים', color: '#898AC4' },
             { id: 7, name: 'תבלינים ורטבים', color: '#FFD09B' },
@@ -414,8 +424,9 @@
                     
                     return `
                         <div class="category-group">
-                            <div class="category-header" style="background:${category.color}">
-                                ${category.name}
+                            <div class="category-header">
+                                <span class="category-name">${category.name}</span>
+                                <div class="category-line" style="background:${category.color}"></div>
                             </div>
                             ${items.map(p => `
                                 <div class="product-item ${p.isActive ? '' : 'inactive'}">
