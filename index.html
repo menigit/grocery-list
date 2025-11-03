@@ -607,10 +607,14 @@
                 p.name.toLowerCase() === name.toLowerCase() && 
                 (!editingProductId || p.id !== editingProductId)
             );
-
             if (existing) {
                 alert('מוצר בשם זה כבר קיים');
                 return;
+            }
+
+            let index;
+            if (editingProductId) {
+                index = products.findIndex(p => p.id === editingProductId);
             }
 
             const product = {
@@ -619,12 +623,11 @@
                 quantity: document.getElementById('product-quantity').value.trim(),
                 category: parseInt(document.getElementById('product-category').value),
                 isPermanent: document.getElementById('product-permanent').checked,
-                isActive: true,
+                isActive: editingProductId ? products[index].isActive : true,
                 isUnurgent: document.getElementById('product-unurgent').checked
             };
 
             if (editingProductId) {
-                const index = products.findIndex(p => p.id === editingProductId);
                 products[index] = product;
             } else {
                 products.push(product);
