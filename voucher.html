@@ -1,35 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>שוברים</title>
+    <title>ניהול שוברים</title>
+
+    <!-- ##################################################################################### -->
+    <!-- #####################################   Style   ##################################### -->
+    <!-- ##################################################################################### -->
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            padding: 20px;
-            direction: rtl;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: #fdf6f0;
+            color: #333;
+            min-height: 100vh;
+            padding-bottom: 100px;
         }
+
+        .container { max-width: 500px; margin: 0 auto; }
+
+        .header {
+            background: #fff8f2;
+            padding: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid #e0dcdc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            text-align: center;
+            color: #6b4c3b;
+        }
+
+        .tabs { display:flex; gap:10px; }
+
+        .tab-btn {
+            flex:1;
+            padding:10px;
+            background: #ffe6d9;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #6b4c3b;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #ffd4b5;
+            font-weight: bold;
+        }
+
+        .content { padding: 10px; }
+
+        .voucher-item {
+            background: #b8ccb0;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .voucher-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .voucher-item.redeemed {
+            opacity: 0.6;
+            background: #d0d8cc;
+        }
+
+        .voucher-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2d3d2d;
+            margin-bottom: 6px;
+        }
+
+        .voucher-balance {
+            font-size: 18px;
+            color: #5a7043;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .voucher-code {
+            font-size: 13px;
+            color: #5a6b5a;
+            word-break: break-all;
+        }
+
+        .voucher-redeemed-badge {
+            display: inline-block;
+            background: #7a8f5f;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        .bottom-actions {
+            position: fixed;
+            bottom:0;
+            left:50%;
+            transform: translateX(-50%);
+            max-width:500px;
+            width:100%;
+            background: #fff8f2;
+            padding:12px;
+            border-top:1px solid #e0dcdc;
+            display:flex;
+            gap:10px;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+        }
+
+        .action-btn {
+            flex:1;
+            padding:10px;
+            border:none;
+            border-radius:8px;
+            background: #7a8f5f;
+            color: #fff;
+            cursor:pointer;
+            font-size:14px;
+            display:flex;
+            align-items:center;
+            justify-content:space-evenly;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover { background: #6a7f4f; }
+
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .action-btn.btn-more {flex:0.5;}
 
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            z-index:1000;
         }
+
+        .modal-overlay.active { display:flex; }
 
         .modal-card {
             background-color: #b8ccb0;
@@ -218,6 +349,12 @@
             background-color: #6a7f4f;
         }
 
+        .btn-mark-used:disabled {
+            background-color: #c0cbb8;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         .btn-save {
             background-color: #5a7043;
             color: white;
@@ -225,6 +362,15 @@
 
         .btn-save:hover {
             background-color: #4a6033;
+        }
+
+        .btn-delete {
+            background-color: #c17a7a;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #b16a6a;
         }
 
         .modal-card::-webkit-scrollbar {
@@ -240,30 +386,178 @@
             background: #7a8f5f;
             border-radius: 10px;
         }
+
+        .empty-state { 
+            text-align:center; 
+            padding:40px 20px; 
+            color:#7a8f5f; 
+        }
+
+        .modal {
+            background:#fff;
+            border-radius:12px;
+            padding:20px;
+            width:100%;
+            max-width:400px;
+            max-height:90vh;
+            overflow:auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .modal h2 { 
+            margin:0 0 20px 0; 
+            font-size:20px; 
+            color:#6b4c3b; 
+        }
+
+        .search-results .voucher-item { 
+            padding: 10px 12px; 
+        }
+
+        .modal-more-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+        }
+
+        .modal-more-actions .btn {
+            width: 100%;
+        }
+
+        .modal-more-actions .btn.btn-cancel {
+            margin-top: 30px;
+        }
+        
+        .modal-more-actions .action-group {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            width: 100%;
+            padding: 20px 0;
+            margin: 20px 0;
+            border-top: 1px solid #e0dcdc;
+            border-bottom: 1px solid #e0dcdc;
+        }
+
+        .modal-more-actions .action-group .btn {
+            border: 2px solid #7a8f5f;
+            color: #7a8f5f;
+            background-color: transparent;
+        }
+
+        .modal-more-actions .action-group .btn.btn-delete {
+            border-color: #c17a7a;
+            color: #c17a7a;
+            background-color: transparent;
+        }
+
+        .back-link {
+            background: transparent;
+            border: none;
+            color: #6b4c3b;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .back-link:hover {
+            color: #5a3c2b;
+        }
+
+        .back-link svg {
+            width: 18px;
+            height: 18px;
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
-    <div class="modal-overlay">
-        <div class="modal-card">
+    <svg style="display:none;">
+        <symbol id="icon-circle-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12h8"/>
+            <path d="M12 8v8"/>
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21 21-4.34-4.34"/>
+            <circle cx="11" cy="11" r="8"/>
+        </symbol>
+        <symbol id="icon-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+            <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+        </symbol>
+        <symbol id="icon-ellipsis" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="17" r="1"/><circle cx="19" cy="17" r="1"/><circle cx="5" cy="17" r="1"/>
+        </symbol>
+        <symbol id="icon-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+        </symbol>
+    </svg>
+
+    <!-- ##################################################################################### -->
+    <!-- #####################################   Body    ##################################### -->
+    <!-- ##################################################################################### -->
+    <div class="container">
+        <div class="header">
+            <button class="back-link" onclick="goBack()">
+                <svg><use href="#icon-chevron-left"></use></svg>
+                חזרה לרשימת קניות
+            </button>
+            <h1>ניהול שוברים</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showActiveVouchers(true)">
+                    שוברים פעילים (<span id="active-count">0</span>)
+                </button>
+                <button class="tab-btn" onclick="showActiveVouchers(false)">
+                    שוברים לא פעילים (<span id="inactive-count">0</span>)
+                </button>
+            </div>
+        </div>
+
+        <div class="content" id="vouchers-list"></div>
+
+        <div class="bottom-actions">
+            <button class="action-btn" onclick="openCreateModal()">
+                <svg><use href="#icon-circle-plus"></use></svg>צור שובר
+            </button>
+            <button class="action-btn" onclick="openSearchModal()">
+                <svg><use href="#icon-search"></use></svg>חפש שובר
+            </button>
+            <button class="action-btn btn-more" onclick="openMoreModal()">
+                עוד<svg><use href="#icon-ellipsis"></use></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <h2 id="modal-title" style="color: #2d3d2d; text-align: center; margin-bottom: 20px;">יצירת שובר חדש</h2>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label>שם</label>
-                    <input type="text" id="name" placeholder="הקלד שם ...">
+                    <input type="text" id="voucher-name" placeholder="הקלד שם ...">
                 </div>
                 <div class="form-group value-group">
                     <label>שווי</label>
-                    <input type="text" id="value" placeholder="הקלד שווי ...">
+                    <input type="text" id="voucher-value" placeholder="הקלד שווי ...">
                 </div>
             </div>
 
             <div class="form-group" style="margin-bottom: 20px;">
                 <label>קוד</label>
-                <input type="text" id="code" placeholder="הקלד קוד שובר או קישור ...">
+                <input type="text" id="voucher-code" placeholder="הקלד קוד שובר או קישור ...">
             </div>
 
             <div class="form-group" style="margin-bottom: 20px;">
                 <label>תיאור</label>
-                <textarea id="description" placeholder="הקלד תיאור ..."></textarea>
+                <textarea id="voucher-description" placeholder="הקלד תיאור ..."></textarea>
             </div>
 
             <div class="redemptions-box">
@@ -271,32 +565,92 @@
                     <input type="text" id="redemption-value" placeholder="הקלד ערך המימוש ...">
                     <button class="add-redemption-btn" onclick="addRedemption()">הוסף מימוש</button>
                 </div>
-                <div class="redemptions-list" id="redemptions-list">
-                    <!-- Exanple Redemption Items: -->
-                    <!-- <div class="redemption-item">
-                        <button class="delete-btn" onclick="deleteRedemption(this)">✕</button>
-                        <span class="date">05.11.2025 23:02</span>
-                        <span class="amount">2.00 ₪</span>
-                    </div> -->
-                </div>
+                <div class="redemptions-list" id="redemptions-list"></div>
             </div>
 
             <div class="form-row">
                 <div class="balance-box">
                     <span class="balance-label">יתרה</span>
-                    <span class="balance-amount" id="balance"></span>
+                    <span class="balance-amount" id="balance">0.00 ₪</span>
                 </div>
-                <button class="btn btn-mark-used" onclick="markAsUsed()">סמן כמומש</button>
+                <button class="btn btn-mark-used" id="mark-used-btn" onclick="markAsUsed()">סמן כמומש</button>
             </div>
 
             <div class="button-row">
                 <button class="btn btn-save" onclick="saveVoucher()">שמור</button>
-                <button class="btn btn-cancel" onclick="cancelModal()">ביטול</button>
+                <button class="btn btn-delete" id="delete-btn" style="display:none" onclick="deleteVoucher()">מחק</button>
+                <button class="btn btn-cancel" onclick="closeEditModal()">ביטול</button>
             </div>
         </div>
     </div>
 
+    <!-- Search Modal -->
+    <div class="modal-overlay" id="search-modal">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2>חיפוש שובר</h2>
+            
+            <div class="form-group">
+                <input type="text" id="search-input" placeholder="הקלד שם או תיאור..." oninput="performSearch()" style="background: #fff0ea; color: #6b4c3b;" />
+            </div>
+
+            <div class="search-results" id="search-results"></div>
+
+            <button class="btn btn-cancel" style="width:100%; margin-top: 20px;" onclick="closeSearchModal()">סגור</button>
+        </div>
+    </div>
+
+    <!-- More Modal -->
+    <div class="modal-overlay" id="more-modal">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2>עוד אפשרויות</h2>
+            <div class="modal-more-actions">
+                <div class="action-group">
+                    <button class="btn" onclick="exportData()">ייצא נתונים</button>
+                    <button class="btn" onclick="importData()">ייבא נתונים</button>
+                    <button class="btn btn-delete" onclick="deleteAllData()">מחק הכל</button>
+                </div>
+                <button class="btn btn-cancel" onclick="closeMoreModal()">ביטול</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ##################################################################################### -->
+    <!-- #####################################  Script   ##################################### -->
+    <!-- ##################################################################################### -->
     <script>
+        let vouchers = [];
+        let showingActive = true;
+        let editingVoucherId = null;
+        let currentRedemptions = [];
+
+        // Initialize
+        function init() {
+            loadVouchers();
+            renderVouchers();
+        }
+
+        // Storage functions
+        function loadVouchers() {
+            try {
+                const data = localStorage.getItem('vouchers-data');
+                if (data) {
+                    vouchers = JSON.parse(data);
+                }
+            } catch (error) {
+                console.log('No existing vouchers found');
+            }
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('vouchers-data', JSON.stringify(vouchers));
+            } catch (error) {
+                console.error('Failed to save:', error);
+                alert('שגיאה בשמירת הנתונים');
+            }
+        }
+
+        // Utility functions
         function formatDateTime() {
             const now = new Date();
             const day = String(now.getDate()).padStart(2, '0');
@@ -307,23 +661,141 @@
             return `${day}.${month}.${year} ${hours}:${minutes}`;
         }
 
-        function calculateBalance() {
-            const initialValue = parseFloat(document.getElementById('value').value) || 0;
-            const redemptionItems = document.querySelectorAll('.redemption-item .amount');
-            let totalRedemptions = 0;
-            
-            redemptionItems.forEach(item => {
-                const amount = parseFloat(item.textContent.replace('₪', '').trim()) || 0;
-                totalRedemptions += amount;
-            });
-            
-            const balance = initialValue - totalRedemptions;
+        function calculateBalance(initialValue, redemptions) {
+            const initial = parseFloat(initialValue) || 0;
+            const total = redemptions.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+            return initial - total;
+        }
+
+        function updateBalanceDisplay() {
+            const initialValue = document.getElementById('voucher-value').value;
+            const balance = calculateBalance(initialValue, currentRedemptions);
             document.getElementById('balance').textContent = `${balance.toFixed(2)} ₪`;
+            
+            // Update mark as used button state
+            const markUsedBtn = document.getElementById('mark-used-btn');
+            if (editingVoucherId) {
+                const voucher = vouchers.find(v => v.id === editingVoucherId);
+                if (voucher && voucher.isRedeemed) {
+                    markUsedBtn.textContent = 'מומש';
+                    markUsedBtn.disabled = true;
+                } else {
+                    markUsedBtn.textContent = 'סמן כמומש';
+                    markUsedBtn.disabled = false;
+                }
+            }
+        }
+
+        // Render functions
+        function renderVouchers() {
+            const filtered = vouchers.filter(v => 
+                showingActive ? !v.isRedeemed : v.isRedeemed
+            );
+            
+            const container = document.getElementById('vouchers-list');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state">אין שוברים ברשימה</div>';
+            } else {
+                container.innerHTML = filtered.map(v => {
+                    const balance = calculateBalance(v.initialValue, v.redemptions);
+                    return `
+                        <div class="voucher-item ${v.isRedeemed ? 'redeemed' : ''}" onclick="openEditModal(${v.id})">
+                            <div class="voucher-name">${v.name}</div>
+                            <div class="voucher-balance">יתרה: ${balance.toFixed(2)} ₪</div>
+                            <div class="voucher-code">${v.code || 'אין קוד'}</div>
+                            ${v.isRedeemed ? '<span class="voucher-redeemed-badge">מומש</span>' : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            updateCounts();
+        }
+
+        function updateCounts() {
+            document.getElementById('active-count').textContent = 
+                vouchers.filter(v => !v.isRedeemed).length;
+            document.getElementById('inactive-count').textContent = 
+                vouchers.filter(v => v.isRedeemed).length;
+        }
+
+        function renderRedemptions() {
+            const list = document.getElementById('redemptions-list');
+            if (currentRedemptions.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+            
+            list.innerHTML = currentRedemptions.map((r, index) => `
+                <div class="redemption-item">
+                    <button class="delete-btn" onclick="deleteRedemption(${index})">✕</button>
+                    <span class="date">${r.date}</span>
+                    <span class="amount">${parseFloat(r.amount).toFixed(2)} ₪</span>
+                </div>
+            `).join('');
+        }
+
+        // Actions
+        function showActiveVouchers(active) {
+            showingActive = active;
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs[0].classList.toggle('active', active);
+            tabs[1].classList.toggle('active', !active);
+            renderVouchers();
+        }
+
+        function openCreateModal() {
+            editingVoucherId = null;
+            currentRedemptions = [];
+            document.getElementById('modal-title').textContent = 'יצירת שובר חדש';
+            document.getElementById('voucher-name').value = '';
+            document.getElementById('voucher-value').value = '';
+            document.getElementById('voucher-code').value = '';
+            document.getElementById('voucher-description').value = '';
+            document.getElementById('redemption-value').value = '';
+            document.getElementById('delete-btn').style.display = 'none';
+            document.getElementById('mark-used-btn').textContent = 'סמן כמומש';
+            document.getElementById('mark-used-btn').disabled = false;
+            renderRedemptions();
+            updateBalanceDisplay();
+            document.getElementById('edit-modal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const voucher = vouchers.find(v => v.id === id);
+            if (!voucher) return;
+            
+            editingVoucherId = id;
+            currentRedemptions = [...voucher.redemptions];
+            document.getElementById('modal-title').textContent = 'עריכת שובר';
+            document.getElementById('voucher-name').value = voucher.name;
+            document.getElementById('voucher-value').value = voucher.initialValue;
+            document.getElementById('voucher-code').value = voucher.code || '';
+            document.getElementById('voucher-description').value = voucher.description || '';
+            document.getElementById('redemption-value').value = '';
+            document.getElementById('delete-btn').style.display = 'block';
+            
+            if (voucher.isRedeemed) {
+                document.getElementById('mark-used-btn').textContent = 'מומש';
+                document.getElementById('mark-used-btn').disabled = true;
+            } else {
+                document.getElementById('mark-used-btn').textContent = 'סמן כמומש';
+                document.getElementById('mark-used-btn').disabled = false;
+            }
+            
+            renderRedemptions();
+            updateBalanceDisplay();
+            document.getElementById('edit-modal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
         }
 
         function addRedemption() {
-            const redemptionInput = document.getElementById('redemption-value');
-            const value = redemptionInput.value.trim();
+            const input = document.getElementById('redemption-value');
+            const value = input.value.trim();
             
             if (value === '') {
                 alert('נא להזין ערך מימוש');
@@ -336,62 +808,199 @@
                 return;
             }
             
-            const redemptionsList = document.getElementById('redemptions-list');
-            const newRedemption = document.createElement('div');
-            newRedemption.className = 'redemption-item';
-            newRedemption.innerHTML = `
-                <button class="delete-btn" onclick="deleteRedemption(this)">✕</button>
-                <span class="date">${formatDateTime()}</span>
-                <span class="amount">${numValue.toFixed(2)} ₪</span>
-            `;
+            currentRedemptions.unshift({
+                amount: numValue,
+                date: formatDateTime()
+            });
             
-            redemptionsList.insertBefore(newRedemption, redemptionsList.firstChild);
-            redemptionInput.value = '';
-            calculateBalance();
+            input.value = '';
+            renderRedemptions();
+            updateBalanceDisplay();
         }
 
-        function deleteRedemption(button) {
-            const item = button.closest('.redemption-item');
-            if (item) {
-                item.remove();
-                calculateBalance();
-            }
+        function deleteRedemption(index) {
+            currentRedemptions.splice(index, 1);
+            renderRedemptions();
+            updateBalanceDisplay();
         }
 
         function markAsUsed() {
-            document.getElementById('balance').textContent = '0.00 ₪';
-            alert('השובר סומן כמומש במלואו');
+            if (editingVoucherId) {
+                const voucher = vouchers.find(v => v.id === editingVoucherId);
+                if (voucher) {
+                    voucher.isRedeemed = true;
+                    document.getElementById('mark-used-btn').textContent = 'מומש';
+                    document.getElementById('mark-used-btn').disabled = true;
+                }
+            }
         }
 
         function saveVoucher() {
-            const name = document.getElementById('name').value;
-            const value = document.getElementById('value').value;
-            const code = document.getElementById('code').value;
-            const description = document.getElementById('description').value;
+            const name = document.getElementById('voucher-name').value.trim();
+            const value = document.getElementById('voucher-value').value.trim();
             
             if (!name || !value) {
                 alert('נא למלא לפחות שם ושווי');
                 return;
             }
-            
-            alert('השובר נשמר בהצלחה!');
+
+            const numValue = parseFloat(value);
+            if (isNaN(numValue) || numValue < 0) {
+                alert('נא להזין ערך שווי תקין');
+                return;
+            }
+
+            const voucher = {
+                id: editingVoucherId || Date.now(),
+                name: name,
+                initialValue: numValue,
+                code: document.getElementById('voucher-code').value.trim(),
+                description: document.getElementById('voucher-description').value.trim(),
+                redemptions: currentRedemptions,
+                isRedeemed: editingVoucherId ? 
+                    vouchers.find(v => v.id === editingVoucherId).isRedeemed : false
+            };
+
+            if (editingVoucherId) {
+                const index = vouchers.findIndex(v => v.id === editingVoucherId);
+                vouchers[index] = voucher;
+            } else {
+                vouchers.push(voucher);
+            }
+
+            saveToStorage();
+            closeEditModal();
+            renderVouchers();
         }
 
-        function cancelModal() {
-            if (confirm('האם אתה בטוח שברצונך לבטל? השינויים לא יישמרו.')) {
-                alert('הפעולה בוטלה');
+        function deleteVoucher() {
+            if (!confirm('האם למחוק את השובר?')) return;
+            
+            vouchers = vouchers.filter(v => v.id !== editingVoucherId);
+            saveToStorage();
+            closeEditModal();
+            renderVouchers();
+        }
+
+        function openSearchModal() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').innerHTML = 
+                '<div class="empty-state">התחל להקליד לחיפוש שוברים</div>';
+            document.getElementById('search-modal').classList.add('active');
+        }
+
+        function closeSearchModal() {
+            document.getElementById('search-modal').classList.remove('active');
+        }
+
+        function performSearch() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const resultsDiv = document.getElementById('search-results');
+            
+            if (!query) {
+                resultsDiv.innerHTML = '<div class="empty-state">התחל להקליד לחיפוש שוברים</div>';
+                return;
+            }
+
+            const filtered = vouchers.filter(v => 
+                v.name.toLowerCase().includes(query) ||
+                (v.description && v.description.toLowerCase().includes(query))
+            );
+
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="empty-state">לא נמצאו שוברים</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = filtered.map(v => {
+                const balance = calculateBalance(v.initialValue, v.redemptions);
+                return `
+                    <div class="voucher-item ${v.isRedeemed ? 'redeemed' : ''}" onclick="openEditModal(${v.id}); closeSearchModal();">
+                        <div class="voucher-name">${v.name}</div>
+                        <div class="voucher-balance">יתרה: ${balance.toFixed(2)} ₪</div>
+                        <div class="voucher-code">${v.code || 'אין קוד'}</div>
+                        ${v.isRedeemed ? '<span class="voucher-redeemed-badge">מומש</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openMoreModal() {
+            document.getElementById('more-modal').classList.add('active');
+        }
+
+        function closeMoreModal() {
+            document.getElementById('more-modal').classList.remove('active');
+        }
+
+        function exportData() {
+            const data = JSON.stringify(vouchers, null, 2);
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'vouchers-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            closeMoreModal();
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        if (Array.isArray(imported)) {
+                            vouchers = imported;
+                            saveToStorage();
+                            renderVouchers();
+                            closeMoreModal();
+                        } else {
+                            alert('קובץ לא תקין');
+                        }
+                    } catch {
+                        alert('קובץ לא תקין');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function deleteAllData() {
+            if (confirm('האם למחוק את כל השוברים? פעולה זו לא ניתנת לביטול!')) {
+                vouchers = [];
+                saveToStorage();
+                renderVouchers();
+                closeMoreModal();
             }
         }
 
-        document.getElementById('value').addEventListener('input', calculateBalance);
+        function goBack() {
+            window.location.href = "index.html";
+        }
 
+        // Close modals on overlay click
+        document.getElementById('edit-modal').onclick = closeEditModal;
+        document.getElementById('search-modal').onclick = closeSearchModal;
+        document.getElementById('more-modal').onclick = closeMoreModal;
+
+        // Event listeners
+        document.getElementById('voucher-value').addEventListener('input', updateBalanceDisplay);
         document.getElementById('redemption-value').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 addRedemption();
             }
         });
 
-        calculateBalance();
+        // Initialize app
+        init();
     </script>
 </body>
 </html>
