@@ -434,7 +434,7 @@
                     <button class="modal-btn action-btn" onclick="importData()">ייבא נתונים</button>
                     <button class="modal-btn btn-delete" onclick="deleteAllData()">מחק הכל</button>
                 </div>
-                <button class="modal-btn action-btn btn-voucher" onclick="openVoucherScreen()">
+                <button class="modal-btn action-btn btn-voucher" onclick="goToVoucherPage()">
                     <svg><use href="#icon-ticket"></use></svg>שוברים
                     <svg><use href="#icon-chevron-left"></use></svg>
                 </button>
@@ -793,6 +793,10 @@
                 renderProducts();
                 closeMoreModal();
             }
+        }
+
+        function goToVoucherPage() {
+            window.location.href = "voucher.html";
         }
 
         // Close modals on overlay click

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>שוברים</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background-color: #b8ccb0;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px 17px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.value-group {
+            flex: 0.7;
+        }
+
+        label {
+            color: #2d3d2d;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 16px;
+            text-align: right;
+        }
+
+        input, textarea {
+            background-color: rgba(139, 154, 139, 0.5);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 16px;
+            color: #2d3d2d;
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            width: 100%;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #5a6b5a;
+            opacity: 0.7;
+        }
+
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .redemptions-box {
+            border: 2px solid #5a6b5a;
+            border-radius: 20px;
+            padding: 8px;
+            margin: 24px 0;
+            min-height: 100px;
+            max-height: 200px;
+            overflow: hidden;
+            overflow-y: auto;
+        }
+
+        .redemption-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .add-redemption-btn {
+            background-color: #7a8f5f;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 0 22px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .add-redemption-btn:hover {
+            background-color: #6a7f4f;
+        }
+
+        .redemptions-list {
+            margin-top: 15px;
+        }
+
+        .redemption-item {
+            background-color: rgba(139, 154, 139, 0.4);
+            border-radius: 8px;
+            padding: 6px 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            color: #2d3d2d;
+        }
+
+        .redemption-item .amount {
+            font-weight: bold;
+        }
+
+        .redemption-item .date {
+            margin-left: auto;
+        }
+
+        .redemption-item button {
+            margin-right: 3px;
+            margin-left: 10px;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            border: none;
+            color: #2d3d2d;
+            font-size: 15px;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+
+        .balance-box {
+            border: 2px solid #7a8f5f;
+            border-radius: 20px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 2;
+        }
+
+        .balance-label {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2d3d2d;
+        }
+
+        .balance-amount {
+            font-weight: bold;
+            font-size: 20px;
+            color: #2d3d2d;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            justify-content: center;
+        }
+
+        .btn {
+            flex: 1;
+            border: none;
+            border-radius: 20px;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background-color: #8b9a8b;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #7a8a7a;
+        }
+
+        .btn-mark-used {
+            background-color: #7a8f5f;
+            color: white;
+        }
+
+        .btn-mark-used:hover {
+            background-color: #6a7f4f;
+        }
+
+        .btn-save {
+            background-color: #5a7043;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #4a6033;
+        }
+
+        .modal-card::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-card::-webkit-scrollbar-track {
+            background: rgba(139, 154, 139, 0.2);
+            border-radius: 10px;
+        }
+
+        .modal-card::-webkit-scrollbar-thumb {
+            background: #7a8f5f;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-overlay">
+        <div class="modal-card">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>שם</label>
+                    <input type="text" id="name" placeholder="הקלד שם ...">
+                </div>
+                <div class="form-group value-group">
+                    <label>שווי</label>
+                    <input type="text" id="value" placeholder="הקלד שווי ...">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>קוד</label>
+                <input type="text" id="code" placeholder="הקלד קוד שובר או קישור ...">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>תיאור</label>
+                <textarea id="description" placeholder="הקלד תיאור ..."></textarea>
+            </div>
+
+            <div class="redemptions-box">
+                <div class="redemption-input-row">
+                    <input type="text" id="redemption-value" placeholder="הקלד ערך המימוש ...">
+                    <button class="add-redemption-btn" onclick="addRedemption()">הוסף מימוש</button>
+                </div>
+                <div class="redemptions-list" id="redemptions-list">
+                    <!-- Exanple Redemption Items: -->
+                    <!-- <div class="redemption-item">
+                        <button class="delete-btn" onclick="deleteRedemption(this)">✕</button>
+                        <span class="date">05.11.2025 23:02</span>
+                        <span class="amount">2.00 ₪</span>
+                    </div> -->
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="balance-box">
+                    <span class="balance-label">יתרה</span>
+                    <span class="balance-amount" id="balance"></span>
+                </div>
+                <button class="btn btn-mark-used" onclick="markAsUsed()">סמן כמומש</button>
+            </div>
+
+            <div class="button-row">
+                <button class="btn btn-save" onclick="saveVoucher()">שמור</button>
+                <button class="btn btn-cancel" onclick="cancelModal()">ביטול</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatDateTime() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${day}.${month}.${year} ${hours}:${minutes}`;
+        }
+
+        function calculateBalance() {
+            const initialValue = parseFloat(document.getElementById('value').value) || 0;
+            const redemptionItems = document.querySelectorAll('.redemption-item .amount');
+            let totalRedemptions = 0;
+            
+            redemptionItems.forEach(item => {
+                const amount = parseFloat(item.textContent.replace('₪', '').trim()) || 0;
+                totalRedemptions += amount;
+            });
+            
+            const balance = initialValue - totalRedemptions;
+            document.getElementById('balance').textContent = `${balance.toFixed(2)} ₪`;
+        }
+
+        function addRedemption() {
+            const redemptionInput = document.getElementById('redemption-value');
+            const value = redemptionInput.value.trim();
+            
+            if (value === '') {
+                alert('נא להזין ערך מימוש');
+                return;
+            }
+            
+            const numValue = parseFloat(value);
+            if (isNaN(numValue) || numValue <= 0) {
+                alert('נא להזין ערך מספרי חיובי');
+                return;
+            }
+            
+            const redemptionsList = document.getElementById('redemptions-list');
+            const newRedemption = document.createElement('div');
+            newRedemption.className = 'redemption-item';
+            newRedemption.innerHTML = `
+                <button class="delete-btn" onclick="deleteRedemption(this)">✕</button>
+                <span class="date">${formatDateTime()}</span>
+                <span class="amount">${numValue.toFixed(2)} ₪</span>
+            `;
+            
+            redemptionsList.insertBefore(newRedemption, redemptionsList.firstChild);
+            redemptionInput.value = '';
+            calculateBalance();
+        }
+
+        function deleteRedemption(button) {
+            const item = button.closest('.redemption-item');
+            if (item) {
+                item.remove();
+                calculateBalance();
+            }
+        }
+
+        function markAsUsed() {
+            document.getElementById('balance').textContent = '0.00 ₪';
+            alert('השובר סומן כמומש במלואו');
+        }
+
+        function saveVoucher() {
+            const name = document.getElementById('name').value;
+            const value = document.getElementById('value').value;
+            const code = document.getElementById('code').value;
+            const description = document.getElementById('description').value;
+            
+            if (!name || !value) {
+                alert('נא למלא לפחות שם ושווי');
+                return;
+            }
+            
+            alert('השובר נשמר בהצלחה!');
+        }
+
+        function cancelModal() {
+            if (confirm('האם אתה בטוח שברצונך לבטל? השינויים לא יישמרו.')) {
+                alert('הפעולה בוטלה');
+            }
+        }
+
+        document.getElementById('value').addEventListener('input', calculateBalance);
+
+        document.getElementById('redemption-value').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addRedemption();
+            }
+        });
+
+        calculateBalance();
+    </script>
+</body>
+</html>
