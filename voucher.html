@@ -11,10 +11,26 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
 
+        :root {
+            --clr-grn0: #465236;
+            --clr-grn1: #6e8352;
+            --clr-grn2: #97AA7C;
+            --clr-grn3: #B7C7A0;
+            --clr-grn4: #D4E2BE;
+            --clr-grn5: #EEF5E2;
+            --clr-grn6: #8b9a8b;
+            --clr-grn7: #c0cbb8;
+            --clr-gry1: #333;
+            --clr-gry3: #777;
+            --clr-gry2: #888;
+            --clr-gry5: #e0dcdc;
+            --clr-red: #c17a7a;
+        }
+    
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-            background: #fdf6f0;
-            color: #333;
+            background: var(--clr-grn5);
+            color: var(--clr-gey1);
             min-height: 100vh;
             padding-bottom: 100px;
         }
@@ -22,12 +38,12 @@
         .container { max-width: 500px; margin: 0 auto; }
 
         .header {
-            background: #fff8f2;
+            background: var(--clr-grn5);
             padding: 12px;
             position: sticky;
             top: 0;
             z-index: 10;
-            border-bottom: 1px solid #e0dcdc;
+            border-bottom: 1px solid var(--clr-gry5);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
@@ -35,7 +51,7 @@
             margin: 0 0 10px 0;
             font-size: 24px;
             text-align: center;
-            color: #6b4c3b;
+            color: var(--clr-grn0);
         }
 
         .tabs { display:flex; gap:10px; }
@@ -43,24 +59,26 @@
         .tab-btn {
             flex:1;
             padding:10px;
-            background: #ffe6d9;
+            background: var(--clr-grn5);
             border: none;
             border-radius: 8px;
+            border: 1px solid var(--clr-grn4);
+            box-sizing:content-box;
             cursor: pointer;
             font-size: 15px;
-            color: #6b4c3b;
+            color: var(--clr-grn0);
             transition: 0.2s;
         }
 
         .tab-btn.active {
-            background: #ffd4b5;
+            background: var(--clr-grn2);
             font-weight: bold;
         }
 
         .content { padding: 10px; }
 
         .voucher-item {
-            background: #b8ccb0;
+            background: var(--clr-grn4);
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 10px;
@@ -75,33 +93,32 @@
         }
 
         .voucher-item.redeemed {
-            opacity: 0.6;
-            background: #d0d8cc;
+            opacity: 0.5;
         }
 
         .voucher-name {
             font-weight: bold;
             font-size: 16px;
-            color: #2d3d2d;
+            color: var(--clr-gry1);
             margin-bottom: 6px;
         }
 
         .voucher-balance {
             font-size: 18px;
-            color: #5a7043;
+            color: var(--clr-grn1);
             font-weight: bold;
             margin-bottom: 4px;
         }
 
         .voucher-code {
             font-size: 13px;
-            color: #5a6b5a;
+            color: var(--clr-grn1);
             word-break: break-all;
         }
 
         .voucher-redeemed-badge {
             display: inline-block;
-            background: #7a8f5f;
+            background: var(--clr-grn2);
             color: white;
             padding: 4px 12px;
             border-radius: 12px;
@@ -117,9 +134,9 @@
             transform: translateX(-50%);
             max-width:500px;
             width:100%;
-            background: #fff8f2;
+            background: var(--clr-grn5);
             padding:12px;
-            border-top:1px solid #e0dcdc;
+            border-top:1px solid var(--clr-gry5);
             display:flex;
             gap:10px;
             box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
@@ -130,8 +147,8 @@
             padding:10px;
             border:none;
             border-radius:8px;
-            background: #7a8f5f;
-            color: #fff;
+            background: var(--clr-grn1);
+            color: white;
             cursor:pointer;
             font-size:14px;
             display:flex;
@@ -139,8 +156,6 @@
             justify-content:space-evenly;
             transition: 0.2s;
         }
-
-        .action-btn:hover { background: #6a7f4f; }
 
         .action-btn svg {
             width: 20px;
@@ -163,7 +178,7 @@
         .modal-overlay.active { display:flex; }
 
         .modal-card {
-            background-color: #b8ccb0;
+            background-color: var(--clr-grn4);
             border-radius: 30px;
             width: 90%;
             max-width: 600px;
@@ -171,6 +186,12 @@
             overflow-y: auto;
             padding: 20px 17px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        #modal-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--clr-grn0);
         }
 
         .form-row {
@@ -190,8 +211,7 @@
         }
 
         label {
-            color: #2d3d2d;
-            font-weight: bold;
+            color: var(--clr-gry1);
             margin-bottom: 5px;
             font-size: 16px;
             text-align: right;
@@ -203,7 +223,7 @@
             border-radius: 8px;
             padding: 8px 10px;
             font-size: 16px;
-            color: #2d3d2d;
+            color: var(--clr-gry1);
             font-family: Arial, sans-serif;
             direction: rtl;
             text-align: right;
@@ -211,7 +231,7 @@
         }
 
         input::placeholder, textarea::placeholder {
-            color: #5a6b5a;
+            color: var(--clr-gry3);
             opacity: 0.7;
         }
 
@@ -221,7 +241,7 @@
         }
 
         .redemptions-box {
-            border: 2px solid #5a6b5a;
+            border: 1px solid var(--clr-grn1);
             border-radius: 20px;
             padding: 8px;
             margin: 24px 0;
@@ -238,7 +258,7 @@
         }
 
         .add-redemption-btn {
-            background-color: #7a8f5f;
+            background-color: var(--clr-grn2);
             color: white;
             border: none;
             border-radius: 15px;
@@ -247,10 +267,6 @@
             font-weight: bold;
             cursor: pointer;
             white-space: nowrap;
-        }
-
-        .add-redemption-btn:hover {
-            background-color: #6a7f4f;
         }
 
         .redemptions-list {
@@ -266,11 +282,7 @@
             justify-content: space-between;
             align-items: center;
             font-size: 15px;
-            color: #2d3d2d;
-        }
-
-        .redemption-item .amount {
-            font-weight: bold;
+            color: var(--clr-gry1);
         }
 
         .redemption-item .date {
@@ -285,14 +297,14 @@
         .delete-btn {
             background-color: transparent;
             border: none;
-            color: #2d3d2d;
+            color: var(--clr-gry1);
             font-size: 15px;
             cursor: pointer;
             align-self: flex-end;
         }
 
         .balance-box {
-            border: 2px solid #7a8f5f;
+            border: 1px solid var(--clr-grn0);
             border-radius: 20px;
             padding: 8px 12px;
             display: flex;
@@ -304,13 +316,13 @@
         .balance-label {
             font-weight: bold;
             font-size: 18px;
-            color: #2d3d2d;
+            color: var(--clr-grn0);
         }
 
         .balance-amount {
             font-weight: bold;
             font-size: 20px;
-            color: #2d3d2d;
+            color: var(--clr-grn0);
         }
 
         .button-row {
@@ -332,45 +344,29 @@
         }
 
         .btn-cancel {
-            background-color: #8b9a8b;
+            background-color: var(--clr-grn6);
             color: white;
-        }
-
-        .btn-cancel:hover {
-            background-color: #7a8a7a;
         }
 
         .btn-mark-used {
-            background-color: #7a8f5f;
+            background-color: var(--clr-grn2);
             color: white;
         }
 
-        .btn-mark-used:hover {
-            background-color: #6a7f4f;
-        }
-
         .btn-mark-used:disabled {
-            background-color: #c0cbb8;
+            background-color: var(--clr-grn7);
             cursor: not-allowed;
             opacity: 0.6;
         }
 
         .btn-save {
-            background-color: #5a7043;
+            background-color: var(--clr-grn1);
             color: white;
-        }
-
-        .btn-save:hover {
-            background-color: #4a6033;
         }
 
         .btn-delete {
-            background-color: #c17a7a;
+            background-color: var(--clr-red);
             color: white;
-        }
-
-        .btn-delete:hover {
-            background-color: #b16a6a;
         }
 
         .modal-card::-webkit-scrollbar {
@@ -383,18 +379,18 @@
         }
 
         .modal-card::-webkit-scrollbar-thumb {
-            background: #7a8f5f;
+            background: var(--clr-grn2);
             border-radius: 10px;
         }
 
         .empty-state { 
             text-align:center; 
             padding:40px 20px; 
-            color:#7a8f5f; 
+            color:var(--clr-grn2); 
         }
 
         .modal {
-            background:#fff;
+            background: var(--clr-grn5);
             border-radius:12px;
             padding:20px;
             width:100%;
@@ -407,7 +403,7 @@
         .modal h2 { 
             margin:0 0 20px 0; 
             font-size:20px; 
-            color:#6b4c3b; 
+            color:var(--clr-grn0); 
         }
 
         .search-results .voucher-item { 
@@ -436,43 +432,20 @@
             width: 100%;
             padding: 20px 0;
             margin: 20px 0;
-            border-top: 1px solid #e0dcdc;
-            border-bottom: 1px solid #e0dcdc;
+            border-top: 1px solid var(--clr-gry5);
+            border-bottom: 1px solid var(--clr-gry5);
         }
 
         .modal-more-actions .action-group .btn {
-            border: 2px solid #7a8f5f;
-            color: #7a8f5f;
+            border: 2px solid var(--clr-grn1);
+            color: var(--clr-grn1);
             background-color: transparent;
         }
 
         .modal-more-actions .action-group .btn.btn-delete {
-            border-color: #c17a7a;
-            color: #c17a7a;
+            border-color: var(--clr-red);
+            color: var(--clr-red);
             background-color: transparent;
-        }
-
-        .back-link {
-            background: transparent;
-            border: none;
-            color: #6b4c3b;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 5px 0;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-
-        .back-link:hover {
-            color: #5a3c2b;
-        }
-
-        .back-link svg {
-            width: 18px;
-            height: 18px;
-            transform: rotate(180deg);
         }
     </style>
 </head>
@@ -504,10 +477,6 @@
     <!-- ##################################################################################### -->
     <div class="container">
         <div class="header">
-            <button class="back-link" onclick="goBack()">
-                <svg><use href="#icon-chevron-left"></use></svg>
-                חזרה לרשימת קניות
-            </button>
             <h1>ניהול שוברים</h1>
             <div class="tabs">
                 <button class="tab-btn active" onclick="showActiveVouchers(true)">
@@ -537,7 +506,7 @@
     <!-- Create/Edit Modal -->
     <div class="modal-overlay" id="edit-modal">
         <div class="modal-card" onclick="event.stopPropagation()">
-            <h2 id="modal-title" style="color: #2d3d2d; text-align: center; margin-bottom: 20px;">יצירת שובר חדש</h2>
+            <h2 id="modal-title">יצירת שובר חדש</h2>
             
             <div class="form-row">
                 <div class="form-group">
@@ -590,7 +559,7 @@
             <h2>חיפוש שובר</h2>
             
             <div class="form-group">
-                <input type="text" id="search-input" placeholder="הקלד שם או תיאור..." oninput="performSearch()" style="background: #fff0ea; color: #6b4c3b;" />
+                <input type="text" id="search-input" placeholder="הקלד שם או תיאור..." oninput="performSearch()" style="background: var(--clr-grn4); color: var(--clr-gry1);" />
             </div>
 
             <div class="search-results" id="search-results"></div>
