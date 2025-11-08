@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#B87C4C">
     <title>רשימת קניות</title>
 
     <!-- ##################################################################################### -->
@@ -804,8 +805,17 @@
         document.getElementById('search-modal').onclick = closeSearchModal;
         document.getElementById('more-modal').onclick = closeMoreModal;
 
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker failed:', err));
+            });
+        }
+
         // Initialize app
         init();
     </script>
 </body>
+
 </html>
