@@ -691,17 +691,25 @@
             
             const container = document.getElementById('vouchers-list');
             
+            const isValidUrl = (str) => { try { new URL(str); return true; } catch { return false; } };
+
             if (filtered.length === 0) {
                 container.innerHTML = '<div class="empty-state">אין שוברים ברשימה</div>';
             } else {
                 container.innerHTML = filtered.map(v => {
                     const balance = calculateBalance(v.initialValue, v.redemptions);
+                    let codeHtml = "";
+                    if (isValidUrl(v.code)) {
+                        codeHtml = `<a href="${v.code}" target="_blank" onclick="event.stopPropagation()">${v.code}</a>`;
+                    } else {
+                        codeHtml = `<span>${v.code || 'אין קוד'}</span>`;
+                    }
                     return `
                         <div class="voucher-item ${v.isRedeemed ? 'redeemed' : ''}" onclick="openEditModal(${v.id})">
                             <div class="voucher-name">${v.name}</div>
                             <div class="voucher-balance">${balance.toFixed(2)} ₪</div>
                             ${v.isRedeemed ? '<span class="voucher-redeemed-badge">' + redeemedHtml + '</span>' : '<div></div>'}
-                            <div class="voucher-code">${v.code || 'אין קוד'}</div>
+                            <div class="voucher-code">${codeHtml}</div>
                         </div>
                     `;
                 }).join('');
