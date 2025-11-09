@@ -685,9 +685,9 @@
 
         // Render functions
         function renderVouchers() {
-            const filtered = vouchers.filter(v => 
-                showingActive ? !v.isRedeemed : v.isRedeemed
-            );
+            const filtered = vouchers
+                .filter(v => showingActive ? !v.isRedeemed : v.isRedeemed)
+                .sort((a, b) => a.name.localeCompare(b.name, 'he'));
             
             const container = document.getElementById('vouchers-list');
             
@@ -888,7 +888,7 @@
             const filtered = vouchers.filter(v => 
                 v.name.toLowerCase().includes(query) ||
                 (v.description && v.description.toLowerCase().includes(query))
-            );
+            ).sort((a, b) => a.name.localeCompare(b.name, 'he'));
 
             if (filtered.length === 0) {
                 resultsDiv.innerHTML = '<div class="empty-state">לא נמצאו שוברים</div>';
