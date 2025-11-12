@@ -758,6 +758,11 @@
             openedModal = id;
         }
 
+        function popStateOfModal() {
+            if (openedModal) history.back();
+            openedModal = null;
+        }
+
         function openCreateModal() {
             editingVoucherId = null;
             currentRedemptions = [];
@@ -798,7 +803,7 @@
 
         function closeEditModal() {
             document.getElementById('edit-modal').classList.remove('active');
-            openedModal = null;
+            popStateOfModal()
         }
 
         function addRedemption() {
@@ -894,7 +899,7 @@
 
         function closeSearchModal() {
             document.getElementById('search-modal').classList.remove('active');
-            openedModal = null;
+            popStateOfModal()
         }
 
         function performSearch() {
@@ -936,7 +941,7 @@
 
         function closeMoreModal() {
             document.getElementById('more-modal').classList.remove('active');
-            openedModal = null;
+            popStateOfModal()
         }
 
         function exportData() {

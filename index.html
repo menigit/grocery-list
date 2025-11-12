@@ -598,6 +598,11 @@
             openedModal = id;
         }
 
+        function popStateOfModal() {
+            if (openedModal) history.back();
+            openedModal = null;
+        }
+
         function openCreateModal() {
             editingProductId = null;
             document.getElementById('modal-title').textContent = 'יצירת מוצר חדש';
@@ -629,7 +634,7 @@
 
         function closeEditModal() {
             document.getElementById('edit-modal').classList.remove('active');
-            openedModal = null;
+            popStateOfModal()
         }
 
         function saveProduct() {
@@ -703,7 +708,7 @@
 
         function closeSearchModal() {
             document.getElementById('search-modal').classList.remove('active');
-            openedModal = null;
+            popStateOfModal()
         }
 
         function performSearch() {
@@ -762,7 +767,7 @@
 
         function closeMoreModal() {
             document.getElementById('more-modal').classList.remove('active');
-            openedModal = null;
+            popStateOfModal()
         }
 
         function exportData() {
