@@ -9,7 +9,10 @@
     <!-- #####################################   Style   ##################################### -->
     <!-- ##################################################################################### -->
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        * {
+            margin:0; padding:0; box-sizing:border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         :root {
             --clr-grn0: #465236;
@@ -60,7 +63,6 @@
             flex:1;
             padding:10px;
             background: var(--clr-grn5);
-            border: none;
             border-radius: 8px;
             border: 1px solid var(--clr-grn4);
             box-sizing:content-box;
@@ -129,7 +131,7 @@
             display: inline-block;
             background: var(--clr-grn2);
             color: white;
-            padding: 3px 12px;
+            padding: 1px 12px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: bold;
