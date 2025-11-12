@@ -467,6 +467,7 @@
         let products = [];
         let showingActive = true;
         let editingProductId = null;
+        let openedModal = null;
 
         // Initialize
         async function init() {
@@ -592,6 +593,11 @@
             }
         }
 
+        function pushStateForModal(id) {
+            history.pushState({ modalOpen: true }, '');
+            openedModal = id;
+        }
+
         function openCreateModal() {
             editingProductId = null;
             document.getElementById('modal-title').textContent = 'יצירת מוצר חדש';
@@ -602,6 +608,7 @@
             document.getElementById('product-unurgent').checked = false;
             document.getElementById('delete-btn').style.display = 'none';
             document.getElementById('edit-modal').classList.add('active');
+            pushStateForModal('edit-modal');
         }
 
         function openEditModal(id) {
@@ -617,10 +624,12 @@
             document.getElementById('product-unurgent').checked = product.isUnurgent || false;
             document.getElementById('delete-btn').style.display = 'block';
             document.getElementById('edit-modal').classList.add('active');
+            pushStateForModal('edit-modal');
         }
 
         function closeEditModal() {
             document.getElementById('edit-modal').classList.remove('active');
+            openedModal = null;
         }
 
         function saveProduct() {
@@ -689,10 +698,12 @@
             document.getElementById('search-results').innerHTML = 
                 '<div class="empty-state">התחל להקליד לחיפוש מוצרים</div>';
             document.getElementById('search-modal').classList.add('active');
+            pushStateForModal('search-modal');
         }
 
         function closeSearchModal() {
             document.getElementById('search-modal').classList.remove('active');
+            openedModal = null;
         }
 
         function performSearch() {
@@ -746,10 +757,12 @@
 
         function openMoreModal() {
             document.getElementById('more-modal').classList.add('active');
+            pushStateForModal('more-modal');
         }
 
         function closeMoreModal() {
             document.getElementById('more-modal').classList.remove('active');
+            openedModal = null;
         }
 
         function exportData() {
@@ -817,6 +830,12 @@
                 .catch(err => console.log('Service Worker failed:', err));
             });
         }
+
+        window.addEventListener('popstate', (event) => {
+            if (openedModal)
+                document.getElementById(openedModal).classList.remove('active');
+            openedModal = null;
+        });
 
         // Initialize app
         init();

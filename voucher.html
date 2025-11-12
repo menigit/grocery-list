@@ -624,6 +624,7 @@
         let editingVoucherId = null;
         let currentRedemptions = [];
         let currentIsRedeemed = false;
+        let openedModal = null;
         const redeemedHtml = '<svg class="ban-icon"><use href="#icon-ban"></use></svg> מומש'
 
         // Initialize
@@ -752,6 +753,11 @@
             renderVouchers();
         }
 
+        function pushStateForModal(id) {
+            history.pushState({ modalOpen: true }, '');
+            openedModal = id;
+        }
+
         function openCreateModal() {
             editingVoucherId = null;
             currentRedemptions = [];
@@ -766,6 +772,7 @@
             renderRedemptions();
             updateBalanceDisplay();
             document.getElementById('edit-modal').classList.add('active');
+            pushStateForModal('edit-modal');
         }
 
         function openEditModal(id) {
@@ -786,10 +793,12 @@
             renderRedemptions();
             updateBalanceDisplay();
             document.getElementById('edit-modal').classList.add('active');
+            pushStateForModal('edit-modal');
         }
 
         function closeEditModal() {
             document.getElementById('edit-modal').classList.remove('active');
+            openedModal = null;
         }
 
         function addRedemption() {
@@ -880,10 +889,12 @@
             document.getElementById('search-results').innerHTML = 
                 '<div class="empty-state">התחל להקליד לחיפוש שוברים</div>';
             document.getElementById('search-modal').classList.add('active');
+            pushStateForModal('search-modal');
         }
 
         function closeSearchModal() {
             document.getElementById('search-modal').classList.remove('active');
+            openedModal = null;
         }
 
         function performSearch() {
@@ -920,10 +931,12 @@
 
         function openMoreModal() {
             document.getElementById('more-modal').classList.add('active');
+            pushStateForModal('more-modal');
         }
 
         function closeMoreModal() {
             document.getElementById('more-modal').classList.remove('active');
+            openedModal = null;
         }
 
         function exportData() {
@@ -989,6 +1002,12 @@
             if (e.key === 'Enter') {
                 addRedemption();
             }
+        });
+
+        window.addEventListener('popstate', (event) => {
+            if (openedModal)
+                document.getElementById(openedModal).classList.remove('active');
+            openedModal = null;
         });
 
         // Initialize app
