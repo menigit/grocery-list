@@ -498,6 +498,11 @@
             <path d="M4.929 4.929 19.07 19.071" />
             <circle cx="12" cy="12" r="10" />
         </symbol>
+        <symbol id="icon-shopping-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="21" r="1"/>
+            <circle cx="19" cy="21" r="1"/>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+        </symbol>
     </svg>
 
     <!-- ##################################################################################### -->
@@ -601,7 +606,8 @@
         <div class="modal" onclick="event.stopPropagation()">
             <h2>עוד אפשרויות</h2>
             <div class="modal-more-actions">
-                <button class="modal-btn action-btn" style="background: var(--clr-grn1); color: white; display: flex; align-items: center; justify-content: space-between;" onclick="goBack()">
+                <button class="modal-btn action-btn" style="background: #B87C4C; color: white; display: flex; align-items: center; justify-content: space-between;" onclick="goBack()">
+                    <svg style="width: 20px; height: 20px;"><use href="#icon-shopping-cart"></use></svg>
                     חזרה לרשימת קניות
                     <svg style="transform: rotate(180deg); width: 20px; height: 20px;"><use href="#icon-chevron-left"></use></svg>
                 </button>
