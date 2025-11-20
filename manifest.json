@@ -3,8 +3,8 @@
   "short_name": "Groceries",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#FDF6F0",
-  "theme_color": "#B87C4C",
+  "background_color": "#eee9df",
+  "theme_color": "#eee9df",
   "icons": [
     {
       "src": "icons/icon-192.png",
