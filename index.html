@@ -107,6 +107,7 @@
         }
 
         .product-name { flex:1; font-size:15px; display:flex; align-items:center; gap:6px; }
+        .product-name.urgent { color: #aaa; }
 
         .icon-group {
             display: flex;
@@ -523,10 +524,10 @@
                                 <div class="category-line" style="background:${category.color}"></div>
                             </div>
                             ${items.map(p => `
-                                <div class="product-item ${p.isActive && !p.isUnurgent ? '' : 'inactive'}">
+                                <div class="product-item ${p.isActive ? '' : 'inactive'}">
                                     <input type="checkbox" ${p.isActive ? '' : 'checked'} 
                                            onchange="toggleActive(${p.id})" />
-                                    <div class="product-name">
+                                    <div class="product-name ${p.isUnurgent ? 'urgent' : ''}">
                                         <span>${p.name}${p.quantity ? ` (${p.quantity})` : ''}</span>
                                     </div>
                                 <div class="icon-group">
