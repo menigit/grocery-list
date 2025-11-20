@@ -213,11 +213,71 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
         #modal-title {
-            margin: 0 0 12px 0;
+            margin: 0;
             font-size: 18px;
             color: var(--clr-grn0);
         }
+
+        .modal-menu-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--clr-grn1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .modal-menu-btn:hover {background: rgba(139, 154, 139, 0.2);}
+
+        .modal-menu-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-menu-btn.hidden {visibility: hidden;}
+
+        .modal-menu-popup {
+            position: absolute;
+            top: 34px;
+            left: 0;
+            background: var(--clr-grn4);
+            border: 1px solid var(--clr-grn2);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            z-index: 1001;
+            min-width: 150px;
+            display: none;
+        }
+
+        .modal-menu-popup.active {display: block;}
+
+        .modal-menu-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            color: var(--clr-grn0);
+            font-size: 15px;
+            transition: 0.2s;
+            text-align: right;
+        }
+
+        .modal-menu-item:hover {background: rgba(139, 154, 139, 0.3);}
+        .modal-menu-item:first-child {border-radius: 8px 8px 0 0;}
+        .modal-menu-item:last-child {border-radius: 0 0 8px 8px;}
 
         .form-row {
             display: flex;
@@ -539,7 +599,15 @@
     <!-- Create/Edit Modal -->
     <div class="modal-overlay" id="edit-modal">
         <div class="modal-card">
-            <h2 id="modal-title">יצירת שובר חדש</h2>
+            <div class="modal-header">
+                <h2 id="modal-title">יצירת שובר חדש</h2>
+                <button class="modal-menu-btn hidden" id="voucher-menu-btn" onclick="toggleVoucherMenu(event)">
+                    <svg style="transform: rotate(90deg);"><use href="#icon-ellipsis"></use></svg>
+                    <div class="modal-menu-popup" id="voucher-menu-popup">
+                        <div class="modal-menu-item" onclick="duplicateVoucher()">שכפל שובר</div>
+                    </div>
+                </button>
+            </div>
             
             <div class="form-row">
                 <div class="form-group in-row">
@@ -780,6 +848,7 @@
             document.getElementById('voucher-description').value = '';
             document.getElementById('redemption-value').value = '';
             document.getElementById('delete-btn').style.display = 'none';
+            document.getElementById('voucher-menu-btn').classList.add('hidden');
             renderRedemptions();
             updateBalanceDisplay();
             document.getElementById('edit-modal').classList.add('active');
@@ -800,6 +869,7 @@
             document.getElementById('voucher-description').value = voucher.description || '';
             document.getElementById('redemption-value').value = '';
             document.getElementById('delete-btn').style.display = 'block';
+            document.getElementById('voucher-menu-btn').classList.remove('hidden');
             
             renderRedemptions();
             updateBalanceDisplay();
@@ -809,7 +879,31 @@
 
         function closeEditModal() {
             document.getElementById('edit-modal').classList.remove('active');
+            document.getElementById('voucher-menu-popup').classList.remove('active');
             popStateOfModal()
+        }
+
+        function toggleVoucherMenu(event) {
+            event.stopPropagation();
+            const popup = document.getElementById('voucher-menu-popup');
+            popup.classList.toggle('active');
+        }
+
+        function duplicateVoucher() {
+            // Get current voucher data
+            const name = document.getElementById('voucher-name').value.trim();
+            const description = document.getElementById('voucher-description').value.trim();
+
+            // Close current modal and menu
+            closeEditModal();
+
+            // Open create modal with pre-filled data
+            // TODO: improve this flow (without timeout, popStateOfModal issues)
+            setTimeout(() => {
+                openCreateModal();
+                document.getElementById('voucher-name').value = name;
+                document.getElementById('voucher-description').value = description;
+            }, 200);
         }
 
         function addRedemption() {
@@ -1006,6 +1100,15 @@
         // Close modals on overlay click
         document.getElementById('search-modal').onclick = closeSearchModal;
         document.getElementById('more-modal').onclick = closeMoreModal;
+
+        // Close voucher menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menuPopup = document.getElementById('voucher-menu-popup');
+            const menuBtn = document.getElementById('voucher-menu-btn');
+            if (menuPopup && !menuPopup.contains(event.target) && !menuBtn.contains(event.target)) {
+                menuPopup.classList.remove('active');
+            }
+        });
 
         // Event listeners
         document.getElementById('voucher-value').addEventListener('input', updateBalanceDisplay);
