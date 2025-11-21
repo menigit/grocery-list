@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#eee9df">
+    <title>רשימת קניות</title>
+
+    <!-- ##################################################################################### -->
+    <!-- #####################################   Style   ##################################### -->
+    <!-- ##################################################################################### -->
+    <style>
+        * {
+            margin:0; padding:0; box-sizing:border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: #eee9df;
+            color: #333;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; }
+
+        .header {
+            background: #eee9df;
+            padding: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid #e0dcdc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            text-align: center;
+            color: #6b4c3b;
+        }
+
+        .tabs { display:flex; gap:10px; }
+
+        .tab-btn {
+            flex:1;
+            padding:8px;
+            background: #eee9df;
+            border-radius: 8px;
+            border: 1px solid #dfb694;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #6b4c3b;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #dfb694;
+            font-weight: bold;
+        }
+
+        .content { padding: 10px; }
+
+        .category-group { margin-bottom:10px; }
+
+        .category-header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: .9rem;
+            margin-bottom: 2px;
+        }
+
+        .category-line {
+            width: 100%;
+            height: 2px;
+            border-radius: 2px;
+        }
+
+        .product-item {
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:4px 10px;
+            background: #e9e3d8;
+            margin-bottom:3px;
+            border-radius:6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .product-item.inactive { opacity:0.55; }
+
+        .product-item input[type="checkbox"] {
+            width:20px;
+            height:20px;
+            cursor:pointer;
+            accent-color: #82c0ff;
+        }
+
+        .product-name { flex:1; font-size:15px; display:flex; align-items:center; gap:6px; }
+        .product-name.urgent { color: #aaa; }
+
+        .icon-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-group svg {
+            color: #B87C4C;
+            width: 16px;
+            height: 16px;
+        }
+
+        .icon-group #iconLine {color: #333;}
+
+        .edit-btn {
+            background: transparent;
+            border:none;
+            cursor:pointer;
+            padding:2px;
+            font-size:120px;
+            display:flex;
+            align-items:center;
+        }
+
+        .edit-btn svg {
+            color: #6b4c3b;
+            width: 20px;
+            height: 20px;
+        }
+
+        .bottom-actions {
+            position: fixed;
+            bottom:0;
+            left:50%;
+            transform: translateX(-50%);
+            max-width:500px;
+            width:100%;
+            background: #eee9df;
+            padding:12px;
+            border-top:1px solid #e0dcdc;
+            display:flex;
+            gap:10px;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+        }
+
+        .action-btn {
+            flex:1;
+            padding:10px;
+            border:none;
+            border-radius:8px;
+            background: #B87C4C;
+            color: #fff;
+            cursor:pointer;
+            font-size:14px;
+            display:flex;
+            align-items:center;
+            justify-content:space-evenly;
+            transition: 0.2s;
+        }
+
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            display: none;
+            align-items:self-start;
+            justify-content:center;
+            padding:20px;
+            z-index:1000;
+        }
+
+        .modal-overlay.active { display:flex; }
+
+        .modal {
+            background:#fff;
+            border-radius:12px;
+            padding:20px;
+            width:100%;
+            max-width:400px;
+            max-height:90vh;
+            overflow:auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .modal h2 { margin:0 0 20px 0; font-size:20px; color:#6b4c3b; }
+
+        .form-group { margin-bottom:15px; }
+
+        .form-group label { display:block; margin-bottom:5px; font-size:14px; color:#6b4c3b; }
+
+        .form-group input[type="text"], .form-group select {
+            width:100%;
+            padding:10px;
+            background: #eee9df;
+            border:1px solid #e0dcdc;
+            border-radius:6px;
+            color:#6b4c3b;
+            font-size:15px;
+        }
+
+        .checkbox-label {
+            display:flex !important;
+            align-items:center;
+            justify-content:baseline;
+            gap:8px;
+            cursor:pointer;
+            color:#6b4c3b;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width:18px;
+            height:18px;
+            cursor:pointer;
+            accent-color: #82c0ff;
+        }
+
+        .checkbox-label svg {
+            width:16px;
+            height:16px;
+            margin-left: -2px;
+            color:#B87C4C;
+        }
+
+        .modal-actions { display:flex; gap:10px; margin-top:20px; }
+
+        .modal-btn {
+            flex:1;
+            padding:12px;
+            border:none;
+            border-radius:8px;
+            color:#fff;
+            cursor:pointer;
+            font-size:15px;
+        }
+
+        .btn-save { background:#82c0ff; font-weight:bold; }
+        .btn-delete { background:#ff7a7a; font-weight:bold; }
+        .btn-cancel { background:#b0b0b0; }
+
+        .btn-voucher {
+            background:#6e8352;
+            width: 100% !important;
+            justify-content: space-between;
+        }
+
+        .empty-state { text-align:center; padding:40px 20px; color:#a67c63; }
+
+        .search-results .product-item { padding: 6px 10px; }
+
+        .action-btn.btn-more {flex:0.5;}
+
+        .modal-more-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0px;
+        }
+
+        .modal-more-actions .modal-btn {width: 140px;}
+
+        .modal-more-actions .modal-btn.btn-cancel {
+            width: 100%;
+            margin-top: 30px;
+        }
+        
+        .modal-more-actions .action-group {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            width: 100%;
+            padding: 20px 0;
+            margin: 20px 0;
+            border-top: 1px solid #e0dcdc;
+            border-bottom: 1px solid #e0dcdc;
+        }
+
+        .modal-more-actions .action-group .modal-btn {
+            border: 2px solid #B87C4C;
+            color: #B87C4C;
+            background-color: transparent;
+            &.btn-delete {
+                border-color: #ff7a7a;
+                color: #ff7a7a;
+            }
+        }
+    </style>
+</head>
+<body>
+    <svg style="display:none;">
+        <symbol id="icon-circle-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 12h8"/>
+            <path d="M12 8v8"/>
+        </symbol>
+        <symbol id="icon-repeat2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m2 9 3-3 3 3"/>
+            <path d="M13 18H7a2 2 0 0 1-2-2V6"/>
+            <path d="m22 15-3 3-3-3"/>
+            <path d="M11 6h6a2 2 0 0 1 2 2v10"/>
+        </symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21 21-4.34-4.34"/>
+            <circle cx="11" cy="11" r="8"/>
+        </symbol>
+        <symbol id="icon-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+            <path d="m15 5 4 4"/>
+        </symbol>
+        <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>
+        </symbol>
+        <symbol id="icon-line" viewBox="0 0 2 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 2 2 22"></path>
+        </symbol>
+        <symbol id="icon-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+            <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+        </symbol>
+        <symbol id="icon-ellipsis" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="17" r="1"/><circle cx="19" cy="17" r="1"/><circle cx="5" cy="17" r="1"/>
+        </symbol>
+        <symbol id="icon-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+        </symbol>
+    </svg>
+
+    <!-- ##################################################################################### -->
+    <!-- #####################################   Body    ##################################### -->
+    <!-- ##################################################################################### -->
+    <div class="container">
+        <div class="header">
+            <h1>רשימת קניות</h1>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showActiveList(true)">
+                    לקנות (<span id="active-count">0</span>)
+                </button>
+                <button class="tab-btn" onclick="showActiveList(false)">
+                    נרכשו (<span id="inactive-count">0</span>)
+                </button>
+            </div>
+        </div>
+
+        <div class="content" id="products-list"></div>
+
+        <div class="bottom-actions">
+            <button class="action-btn" onclick="openCreateModal()">
+                <svg><use href="#icon-circle-plus"></use></svg>צור מוצר
+            </button>
+            <button class="action-btn" onclick="openSearchModal()">
+                <svg><use href="#icon-search"></use></svg>חפש מוצר
+            </button>
+            <button class="action-btn btn-more" onclick="openMoreModal()">
+                עוד<svg><use href="#icon-ellipsis"></use></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2 id="modal-title">יצירת מוצר חדש</h2>
+            
+            <div class="form-group">
+                <label>שם המוצר *</label>
+                <input type="text" id="product-name" />
+            </div>
+
+            <div class="form-group">
+                <label>כמות (אופציונלי)</label>
+                <input type="text" id="product-quantity" />
+            </div>
+
+            <div class="form-group">
+                <label>קטגוריה *</label>
+                <select id="product-category"></select>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="product-permanent" />
+                    <svg><use href="#icon-repeat2"></use></svg>
+                    <span>- מוצר קבוע</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="product-unurgent" />
+                    <svg><use href="#icon-moon"></use></svg>
+                    <span>- לא דחוף</span>
+                </label>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn btn-save" onclick="saveProduct()">שמור</button>
+                <button class="modal-btn btn-delete" id="delete-btn" style="display:none" onclick="deleteProduct()">מחק</button>
+                <button class="modal-btn btn-cancel" onclick="closeEditModal()">ביטול</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal-overlay" id="search-modal">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2>חיפוש מוצר קיים</h2>
+            
+            <div class="form-group">
+                <input type="text" id="search-input" placeholder="הקלד שם מוצר..." oninput="performSearch()" />
+            </div>
+
+            <div class="search-results" id="search-results"></div>
+
+            <button class="modal-btn btn-cancel" style="width:100%" onclick="closeSearchModal()">סגור</button>
+        </div>
+    </div>
+
+    <!-- More Modal -->
+    <div class="modal-overlay" id="more-modal">
+        <div class="modal" onclick="event.stopPropagation()">
+            <h2>עוד אפשרויות</h2>
+            <div class="modal-actions modal-more-actions">
+                <button class="modal-btn action-btn" onclick="loadPermanentProducts()">
+                    <svg><use href="#icon-repeat2"></use></svg>טען קבועים
+                </button>
+                <div class="action-group">
+                    <button class="modal-btn action-btn" onclick="exportData()">ייצא נתונים</button>
+                    <button class="modal-btn action-btn" onclick="importData()">ייבא נתונים</button>
+                    <button class="modal-btn btn-delete" onclick="deleteAllData()">מחק הכל</button>
+                </div>
+                <button class="modal-btn action-btn btn-voucher" onclick="goToVoucherPage()">
+                    <svg><use href="#icon-ticket"></use></svg>שוברים
+                    <svg><use href="#icon-chevron-left"></use></svg>
+                </button>
+                <button class="modal-btn btn-cancel" onclick="closeMoreModal()">ביטול</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ##################################################################################### -->
+    <!-- #####################################  Script   ##################################### -->
+    <!-- ##################################################################################### -->
+    <script>
+        const CATEGORIES = [
+            { id: 1, name: 'פירות וירקות', color: '#B6CEB4' },
+            { id: 2, name: 'מוצרי חלב וביצים', color: '#9BB4C0' },
+            { id: 3, name: 'הגיינה, ניקוי ומוצרי בית', color: '#FFA4A4' },
+            { id: 4, name: 'מזון יבש, אפייה ושימורים', color: '#A6AEBF' },
+            { id: 5, name: 'בשר, עוף ודגים', color: '#D57E7E' },
+            { id: 6, name: 'שתייה, ממתקים וחטיפים', color: '#898AC4' },
+            { id: 7, name: 'תבלינים ורטבים', color: '#FFD09B' },
+            { id: 8, name: 'קפואים', color: '#CB9DF0' },
+            { id: 9, name: 'מאפים ודגנים', color: '#CDC2A5' }
+        ];
+
+        let products = [];
+        let showingActive = true;
+        let editingProductId = null;
+        let openedModal = null;
+
+        // Initialize
+        async function init() {
+            loadProducts();
+            populateCategorySelect();
+            renderProducts();
+        }
+
+        // Storage functions
+        function loadProducts() {
+            try {
+                const data = localStorage.getItem('shopping-products');
+                if (data) {
+                    products = JSON.parse(data);
+                }
+            } catch (error) {
+                console.log('No existing products found');
+            }
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('shopping-products', JSON.stringify(products));
+            } catch (error) {
+                console.error('Failed to save:', error);
+                alert('שגיאה בשמירת הנתונים');
+            }
+        }
+
+        // Render functions
+        function renderProducts() {
+            const filtered = products.filter(p => p.isActive === showingActive);
+            const sorted = sortProducts(filtered);
+            const grouped = groupByCategory(sorted);
+            
+            const container = document.getElementById('products-list');
+            
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-state">אין מוצרים ברשימה</div>';
+            } else {
+                container.innerHTML = Object.keys(grouped).map(catId => {
+                    const category = CATEGORIES.find(c => c.id === parseInt(catId));
+                    const items = grouped[catId];
+                    
+                    return `
+                        <div class="category-group">
+                            <div class="category-header">
+                                <span class="category-name">${category.name}</span>
+                                <div class="category-line" style="background:${category.color}"></div>
+                            </div>
+                            ${items.map(p => `
+                                <div class="product-item ${p.isActive ? '' : 'inactive'}">
+                                    <input type="checkbox" ${p.isActive ? '' : 'checked'} 
+                                           onchange="toggleActive(${p.id})" />
+                                    <div class="product-name ${p.isUnurgent ? 'urgent' : ''}">
+                                        <span>${p.name}${p.quantity ? ` (${p.quantity})` : ''}</span>
+                                    </div>
+                                <div class="icon-group">
+                                    ${p.isUnurgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
+                                    ${p.isPermanent ? '<svg><use href="#icon-repeat2"></use></svg>' : ''}
+                                    ${p.isUnurgent || p.isPermanent? '<svg id="iconLine"><use href="#icon-line"></use></svg>' : ''}
+                                    <button class="edit-btn" onclick="openEditModal(${p.id})">
+                                        <svg><use href="#icon-pencil"></use></svg>
+                                    </button>
+                                </div>
+                                </div>
+                            `).join('')}
+                            </div>
+                    `;
+                }).join('');
+            }
+            
+            updateCounts();
+        }
+
+        function sortProducts(list) {
+            return [...list].sort((a, b) => {
+                if (a.category !== b.category) {
+                    return a.category - b.category;
+                }
+                return a.name.localeCompare(b.name, 'he');
+            });
+        }
+
+        function groupByCategory(list) {
+            const grouped = {};
+            list.forEach(p => {
+                if (!grouped[p.category]) grouped[p.category] = [];
+                grouped[p.category].push(p);
+            });
+            return grouped;
+        }
+
+        function updateCounts() {
+            document.getElementById('active-count').textContent = 
+                products.filter(p => p.isActive).length;
+            document.getElementById('inactive-count').textContent = 
+                products.filter(p => !p.isActive).length;
+        }
+
+        function populateCategorySelect() {
+            const select = document.getElementById('product-category');
+            select.innerHTML = CATEGORIES.map(cat => 
+                `<option value="${cat.id}">${cat.name}</option>`
+            ).join('');
+        }
+
+        // Actions
+        function showActiveList(active) {
+            showingActive = active;
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs[0].classList.toggle('active', active);
+            tabs[1].classList.toggle('active', !active);
+            renderProducts();
+        }
+
+        function toggleActive(id) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                product.isActive = !product.isActive;
+                saveToStorage();
+                renderProducts();
+            }
+        }
+
+        function pushStateForModal(id) {
+            history.pushState({ modalOpen: true }, '');
+            openedModal = id;
+        }
+
+        function popStateOfModal() {
+            if (openedModal) history.back();
+            openedModal = null;
+        }
+
+        function openCreateModal() {
+            editingProductId = null;
+            document.getElementById('modal-title').textContent = 'יצירת מוצר חדש';
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-quantity').value = '';
+            document.getElementById('product-category').value = '1';
+            document.getElementById('product-permanent').checked = false;
+            document.getElementById('product-unurgent').checked = false;
+            document.getElementById('delete-btn').style.display = 'none';
+            document.getElementById('edit-modal').classList.add('active');
+            pushStateForModal('edit-modal');
+        }
+
+        function openEditModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            editingProductId = id;
+            document.getElementById('modal-title').textContent = 'עריכת מוצר';
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-quantity').value = product.quantity || '';
+            document.getElementById('product-category').value = product.category;
+            document.getElementById('product-permanent').checked = product.isPermanent || false;
+            document.getElementById('product-unurgent').checked = product.isUnurgent || false;
+            document.getElementById('delete-btn').style.display = 'block';
+            document.getElementById('edit-modal').classList.add('active');
+            pushStateForModal('edit-modal');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+            popStateOfModal()
+        }
+
+        function saveProduct() {
+            const name = document.getElementById('product-name').value.trim();
+            if (!name) {
+                alert('יש למלא שם מוצר');
+                return;
+            }
+
+            const existing = products.find(p => 
+                p.name.toLowerCase() === name.toLowerCase() && 
+                (!editingProductId || p.id !== editingProductId)
+            );
+            if (existing) {
+                alert('מוצר בשם זה כבר קיים');
+                return;
+            }
+
+            let index;
+            if (editingProductId) {
+                index = products.findIndex(p => p.id === editingProductId);
+            }
+
+            const product = {
+                id: editingProductId || Date.now(),
+                name: name,
+                quantity: document.getElementById('product-quantity').value.trim(),
+                category: parseInt(document.getElementById('product-category').value),
+                isPermanent: document.getElementById('product-permanent').checked,
+                isActive: editingProductId ? products[index].isActive : true,
+                isUnurgent: document.getElementById('product-unurgent').checked
+            };
+
+            if (editingProductId) {
+                products[index] = product;
+            } else {
+                products.push(product);
+            }
+
+            saveToStorage();
+            closeEditModal();
+            renderProducts();
+        }
+
+        function deleteProduct() {
+            if (!confirm('האם למחוק את המוצר?')) return;
+            
+            products = products.filter(p => p.id !== editingProductId);
+            saveToStorage();
+            closeEditModal();
+            renderProducts();
+        }
+
+        function loadPermanentProducts() {
+            products = products.map(p => 
+                p.isPermanent ? { ...p, isActive: true } : p
+            );
+            saveToStorage();
+            showActiveList(true);
+            renderProducts();
+            closeMoreModal();
+        }
+
+        function openSearchModal() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').innerHTML = 
+                '<div class="empty-state">התחל להקליד לחיפוש מוצרים</div>';
+            document.getElementById('search-modal').classList.add('active');
+            pushStateForModal('search-modal');
+        }
+
+        function closeSearchModal() {
+            document.getElementById('search-modal').classList.remove('active');
+            popStateOfModal()
+        }
+
+        function performSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            const resultsDiv = document.getElementById('search-results');
+            
+            if (!query) {
+                resultsDiv.innerHTML = '<div class="empty-state">התחל להקליד לחיפוש מוצרים</div>';
+                return;
+            }
+
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = '<div class="empty-state">לא נמצאו מוצרים</div>';
+                return;
+            }
+
+            const sorted = sortProducts(filtered);
+            const grouped = groupByCategory(sorted);
+
+            resultsDiv.innerHTML = Object.keys(grouped).map(catId => {
+                const category = CATEGORIES.find(c => c.id === parseInt(catId));
+                const items = grouped[catId];
+                
+                return `
+                    <div class="category-group">
+                        <div class="category-header">
+                            <span class="category-name">${category.name}</span>
+                            <div class="category-line" style="background:${category.color}"></div>
+                        </div>
+                        ${items.map(p => `
+                            <div class="product-item ${p.isActive && !p.isUnurgent ? '' : 'inactive'}">
+                                <input type="checkbox" ${p.isActive ? '' : 'checked'} 
+                                       onchange="toggleActive(${p.id})" />
+                                <div class="product-name">
+                                    ${p.name}${p.quantity ? ` (${p.quantity})` : ''}
+                                </div>
+                                <div class="icon-group">
+                                    ${p.isUnurgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
+                                    ${p.isPermanent ? '<svg><use href="#icon-repeat2"></use></svg>' : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openMoreModal() {
+            document.getElementById('more-modal').classList.add('active');
+            pushStateForModal('more-modal');
+        }
+
+        function closeMoreModal() {
+            document.getElementById('more-modal').classList.remove('active');
+            popStateOfModal()
+        }
+
+        function exportData() {
+            const data = JSON.stringify(products, null, 2);
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'shopping-list.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = event => {
+                try {
+                    const imported = JSON.parse(event.target.result);
+                    if (Array.isArray(imported)) {
+                    products = imported;
+                    saveToStorage();
+                    renderProducts();
+                    closeMoreModal();
+                    } else {
+                    alert('קובץ לא תקין');
+                    }
+                } catch {
+                    alert('קובץ לא תקין');
+                }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function deleteAllData() {
+            if (confirm('האם למחוק את כל הנתונים במאגר? פעולה זו לא ניתנת לביטול!')) {
+                products = [];
+                saveToStorage();
+                renderProducts();
+                closeMoreModal();
+            }
+        }
+
+        function goToVoucherPage() {
+            window.location.href = "voucher.html";
+        }
+
+        // Close modals on overlay click
+        document.getElementById('edit-modal').onclick = closeEditModal;
+        document.getElementById('search-modal').onclick = closeSearchModal;
+        document.getElementById('more-modal').onclick = closeMoreModal;
+
+        if (location.hostname !== '127.0.0.1' && location.hostname !== 'localhost' &&
+            'serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker failed:', err));
+            });
+        }
+
+        window.addEventListener('popstate', (event) => {
+            if (openedModal)
+                document.getElementById(openedModal).classList.remove('active');
+            openedModal = null;
+        });
+
+        // Initialize app
+        init();
+    </script>
+</body>
+
+</html>
