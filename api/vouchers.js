@@ -32,17 +32,16 @@ module.exports = async (req, res) => {
         // GET /api/vouchers - Get all vouchers
         if (method === 'GET' && !id) {
             const vouchersQuery = `
-                SELECT id, name, initial_value, code, description, is_redeemed, 
-                       created_at, updated_at
+                SELECT id, name, initial_value, code, description, is_redeemed
                 FROM vouchers
                 ORDER BY name
             `;
             const vouchersResult = await pool.query(vouchersQuery);
             
             const redemptionsQuery = `
-                SELECT id, voucher_id, amount, date, created_at
+                SELECT id, voucher_id, amount, date
                 FROM redemptions
-                ORDER BY voucher_id, created_at DESC
+                ORDER BY voucher_id, date DESC
             `;
             const redemptionsResult = await pool.query(redemptionsQuery);
             
