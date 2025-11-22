@@ -819,14 +819,14 @@
         }
 
         // ==================== Utility Functions ====================
-        function formatDateTime() {
+        function parsDateTime() {
             const now = new Date();
             const day = String(now.getDate()).padStart(2, '0');
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const year = now.getFullYear();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
-            return `${day}.${month}.${year} ${hours}:${minutes}`;
+            return {day, month, year, hours, minutes};
         }
 
         function calculateBalance(initialValue, redemptions) {
@@ -1010,10 +1010,11 @@
                 alert('נא להזין ערך מספרי חיובי');
                 return;
             }
-            
+
+            const d = parsDateTime();
             currentRedemptions.unshift({
                 amount: numValue,
-                date: formatDateTime()
+                date: `${d.day}.${d.month}.${d.year} ${d.hours}:${d.minutes}`
             });
             
             input.value = '';
@@ -1150,9 +1151,11 @@
                 const data = JSON.stringify(vouchers, null, 2);
                 const blob = new Blob([data], { type: "application/json" });
                 const url = URL.createObjectURL(blob);
+                const d = parsDateTime();
+                const filename = `vouchers-${d.year}${d.month}${d.day}_${d.hours}${d.minutes}.json`;
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'vouchers-data.json';
+                a.download = filename;
                 a.click();
                 URL.revokeObjectURL(url);
                 closeMoreModal();
