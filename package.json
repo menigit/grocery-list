@@ -1,0 +1,22 @@
+{
+  "name": "grocery-list",
+  "version": "1.0.0",
+  "description": "Grocery List and Voucher Management Application",
+  "main": "server.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel --prod"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

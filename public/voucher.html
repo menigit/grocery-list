@@ -531,6 +531,32 @@
             color: var(--clr-red);
             background-color: transparent;
         }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-overlay.active { display: flex; }
+
+        .loading-spinner {
+            border: 4px solid var(--clr-grn4);
+            border-top: 4px solid var(--clr-grn1);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -689,10 +715,18 @@
         </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
     <!-- ##################################################################################### -->
     <!-- #####################################  Script   ##################################### -->
     <!-- ##################################################################################### -->
     <script>
+        // Configuration - Vercel Serverless API
+        const API_BASE = '/api';
+
         let vouchers = [];
         let showingActive = true;
         let editingVoucherId = null;
@@ -701,34 +735,90 @@
         let openedModal = null;
         const redeemedHtml = '<svg class="ban-icon"><use href="#icon-ban"></use></svg> מומש'
 
-        // Initialize
-        function init() {
-            loadVouchers();
+        // ==================== API Helper Functions ====================
+        function showLoading() {
+            document.getElementById('loading-overlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.remove('active');
+        }
+
+        async function apiRequest(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'שגיאה בתקשורת עם השרת');
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // ==================== Initialize ====================
+        async function init() {
+            await loadVouchers();
             renderVouchers();
         }
 
-        // Storage functions
-        function loadVouchers() {
+        // ==================== Storage Functions (Neon DB) ====================
+        async function loadVouchers() {
             try {
-                const data = localStorage.getItem('vouchers-data');
-                if (data) {
-                    vouchers = JSON.parse(data);
-                }
+                showLoading();
+                vouchers = await apiRequest('/vouchers');
+                hideLoading();
             } catch (error) {
-                console.log('No existing vouchers found');
+                hideLoading();
+                alert('שגיאה בטעינת השוברים: ' + error.message);
+                vouchers = [];
             }
         }
 
-        function saveToStorage() {
-            try {
-                localStorage.setItem('vouchers-data', JSON.stringify(vouchers));
-            } catch (error) {
-                console.error('Failed to save:', error);
-                alert('שגיאה בשמירת הנתונים');
+        async function saveVoucherToDb(voucher) {
+            if (editingVoucherId) {
+                return await apiRequest(`/vouchers?id=${voucher.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(voucher)
+                });
+            } else {
+                return await apiRequest('/vouchers', {
+                    method: 'POST',
+                    body: JSON.stringify(voucher)
+                });
             }
         }
 
-        // Utility functions
+        async function deleteVoucherFromDb(id) {
+            return await apiRequest(`/vouchers?id=${id}`, {
+                method: 'DELETE'
+            });
+        }
+
+        async function deleteAllVouchersFromDb() {
+            return await apiRequest('/vouchers?action=deleteAll', {
+                method: 'DELETE'
+            });
+        }
+
+        async function importVouchersToDb(vouchersData) {
+            return await apiRequest('/vouchers?action=import', {
+                method: 'POST',
+                body: JSON.stringify(vouchersData)
+            });
+        }
+
+        // ==================== Utility Functions ====================
         function formatDateTime() {
             const now = new Date();
             const day = String(now.getDate()).padStart(2, '0');
@@ -760,7 +850,7 @@
             }
         }
 
-        // Render functions
+        // ==================== Render Functions ====================
         function renderVouchers() {
             const filtered = vouchers
                 .filter(v => showingActive ? !v.isRedeemed : v.isRedeemed)
@@ -818,7 +908,7 @@
             `).join('');
         }
 
-        // Actions
+        // ==================== Actions ====================
         function showActiveVouchers(active) {
             showingActive = active;
             const tabs = document.querySelectorAll('.tab-btn');
@@ -938,12 +1028,11 @@
         }
 
         function markAsUsed() {
-            // Toggle the redeemed state
             currentIsRedeemed = !currentIsRedeemed;
             updateBalanceDisplay();
         }
 
-        function saveVoucher() {
+        async function saveVoucher() {
             const name = document.getElementById('voucher-name').value.trim();
             const value = document.getElementById('voucher-value').value.trim();
             
@@ -968,25 +1057,33 @@
                 isRedeemed: currentIsRedeemed
             };
 
-            if (editingVoucherId) {
-                const index = vouchers.findIndex(v => v.id === editingVoucherId);
-                vouchers[index] = voucher;
-            } else {
-                vouchers.push(voucher);
+            try {
+                showLoading();
+                await saveVoucherToDb(voucher);
+                await loadVouchers();
+                hideLoading();
+                closeEditModal();
+                renderVouchers();
+            } catch (error) {
+                hideLoading();
+                alert('שגיאה בשמירת השובר: ' + error.message);
             }
-
-            saveToStorage();
-            closeEditModal();
-            renderVouchers();
         }
 
-        function deleteVoucher() {
+        async function deleteVoucher() {
             if (!confirm('האם למחוק את השובר?')) return;
             
-            vouchers = vouchers.filter(v => v.id !== editingVoucherId);
-            saveToStorage();
-            closeEditModal();
-            renderVouchers();
+            try {
+                showLoading();
+                await deleteVoucherFromDb(editingVoucherId);
+                await loadVouchers();
+                hideLoading();
+                closeEditModal();
+                renderVouchers();
+            } catch (error) {
+                hideLoading();
+                alert('שגיאה במחיקת השובר: ' + error.message);
+            }
         }
 
         function openSearchModal() {
@@ -1044,39 +1141,51 @@
             popStateOfModal()
         }
 
-        function exportData() {
-            const data = JSON.stringify(vouchers, null, 2);
-            const blob = new Blob([data], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'vouchers-data.json';
-            a.click();
-            URL.revokeObjectURL(url);
-            closeMoreModal();
+        async function exportData() {
+            try {
+                showLoading();
+                await loadVouchers();
+                hideLoading();
+
+                const data = JSON.stringify(vouchers, null, 2);
+                const blob = new Blob([data], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'vouchers-data.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                closeMoreModal();
+            } catch (error) {
+                hideLoading();
+                alert('שגיאה בייצוא הנתונים: ' + error.message);
+            }
         }
 
-        function importData() {
+        async function importData() {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json';
-            input.onchange = e => {
+            input.onchange = async e => {
                 const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = event => {
+                reader.onload = async event => {
                     try {
                         const imported = JSON.parse(event.target.result);
                         if (Array.isArray(imported)) {
-                            vouchers = imported;
-                            saveToStorage();
+                            showLoading();
+                            await importVouchersToDb(imported);
+                            await loadVouchers();
+                            hideLoading();
                             renderVouchers();
                             closeMoreModal();
                         } else {
                             alert('קובץ לא תקין');
                         }
-                    } catch {
-                        alert('קובץ לא תקין');
+                    } catch (error) {
+                        hideLoading();
+                        alert('שגיאה בייבוא הנתונים: ' + error.message);
                     }
                 };
                 reader.readAsText(file);
@@ -1084,12 +1193,19 @@
             input.click();
         }
 
-        function deleteAllData() {
+        async function deleteAllData() {
             if (confirm('האם למחוק את כל השוברים? פעולה זו לא ניתנת לביטול!')) {
-                vouchers = [];
-                saveToStorage();
-                renderVouchers();
-                closeMoreModal();
+                try {
+                    showLoading();
+                    await deleteAllVouchersFromDb();
+                    await loadVouchers();
+                    hideLoading();
+                    renderVouchers();
+                    closeMoreModal();
+                } catch (error) {
+                    hideLoading();
+                    alert('שגיאה במחיקת הנתונים: ' + error.message);
+                }
             }
         }
 
@@ -1097,6 +1213,7 @@
             window.location.href = "index.html";
         }
 
+        // ==================== Event Listeners ====================
         // Close modals on overlay click
         document.getElementById('search-modal').onclick = closeSearchModal;
         document.getElementById('more-modal').onclick = closeMoreModal;
@@ -1110,7 +1227,6 @@
             }
         });
 
-        // Event listeners
         document.getElementById('voucher-value').addEventListener('input', updateBalanceDisplay);
         document.getElementById('redemption-value').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -1124,7 +1240,7 @@
             openedModal = null;
         });
 
-        // Initialize app
+        // ==================== Initialize App ====================
         init();
     </script>
 </body>
