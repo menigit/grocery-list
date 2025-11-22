@@ -2,7 +2,10 @@ const CACHE_NAME = 'grocery-cache-v1';
 const urlsToCache = [
   './',
   './index.html',
-  './voucher.html'
+  './voucher.html',
+  './manifest.json',
+  './icons/app_logo_192.png',
+  './icons/app_logo_512.png'
 ];
 
 self.addEventListener('install', event => {
