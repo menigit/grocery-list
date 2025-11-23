@@ -20,6 +20,11 @@ const setCorsHeaders = (res) => {
 module.exports = async (req, res) => {
     setCorsHeaders(res);
     
+    const token = req.headers['authorization'];
+    if (!token || token !== `TOKEN=${process.env.API_TOKEN}`) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     // Handle preflight
     if (req.method === 'OPTIONS') {
         return res.status(200).end();

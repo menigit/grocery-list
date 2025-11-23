@@ -498,7 +498,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
         }
 
         .modal-more-actions .modal-btn {
@@ -515,8 +514,9 @@
             gap: 10px;
             width: 100%;
             padding: 20px 0;
-            margin: 20px 0;
             border-top: 1px solid var(--clr-gry5);
+        }
+        .modal-more-actions .action-group:last-of-type {
             border-bottom: 1px solid var(--clr-gry5);
         }
 
@@ -530,6 +530,47 @@
             border-color: var(--clr-red);
             color: var(--clr-red);
             background-color: transparent;
+        }
+
+        .api-key-group {
+            flex-direction: column !important;
+            margin-top: 20px;
+        }
+
+        .api-key-section {
+            width: 100%;
+            margin: 0px 0;
+            padding: 0px 0;
+            gap: 10px;
+            display: none;
+        }
+
+        .api-key-section.show {
+            display: flex;
+        }
+
+        .api-key-input {
+            flex: 2;
+            padding: 8px;
+            background: rgba(139, 154, 139, 0.3);
+            border: 1px solid #b4beb4;
+            border-radius: 6px;
+            font-size: 15px;
+            color: var(--clr-grn0);
+            direction: ltr;
+            text-align: left;
+        }
+
+        .api-key-save-btn {
+            flex: 1;
+            padding: 2px;
+            background: var(--clr-grn1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         .loading-overlay {
@@ -705,6 +746,13 @@
                     חזרה לרשימת קניות
                     <svg style="transform: rotate(180deg); width: 20px; height: 20px;"><use href="#icon-chevron-left"></use></svg>
                 </button>
+                <div class="action-group api-key-group">
+                    <button class="modal-btn" onclick="toggleApiKeySection()">הגדר API Key</button>
+                    <div class="api-key-section" id="api-key-section">
+                        <input type="text" class="api-key-input" id="api-key-input" placeholder="Insert API Key...">
+                        <button class="api-key-save-btn" onclick="saveApiKey()">שמור</button>
+                    </div>
+                </div>
                 <div class="action-group">
                     <button class="modal-btn" onclick="exportData()">ייצא נתונים</button>
                     <button class="modal-btn" onclick="importData()">ייבא נתונים</button>
@@ -746,10 +794,12 @@
 
         async function apiRequest(endpoint, options = {}) {
             try {
+                const apiToken = localStorage.getItem('apiToken') || '';
                 const response = await fetch(`${API_BASE}${endpoint}`, {
                     ...options,
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `TOKEN=${apiToken}`,
                         ...options.headers
                     }
                 });
@@ -1135,11 +1185,33 @@
         function openMoreModal() {
             document.getElementById('more-modal').classList.add('active');
             pushStateForModal('more-modal');
+
+            const apiKey = localStorage.getItem('apiToken');
+            if (apiKey) {
+                document.getElementById('api-key-input').value = apiKey;
+            }
         }
 
         function closeMoreModal() {
             document.getElementById('more-modal').classList.remove('active');
+            document.getElementById('api-key-section').classList.remove('show');
             popStateOfModal()
+        }
+
+        function toggleApiKeySection() {
+            const section = document.getElementById('api-key-section');
+            section.classList.toggle('show');
+        }
+
+        function saveApiKey() {
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            if (apiKey) {
+                localStorage.setItem('apiToken', apiKey);
+                alert('API Key נשמר בהצלחה');
+                document.getElementById('api-key-section').classList.remove('show');
+            } else {
+                alert('נא להזין API Key');
+            }
         }
 
         async function exportData() {
