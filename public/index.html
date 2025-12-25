@@ -661,6 +661,7 @@
                 product.isActive = !product.isActive;
                 saveToStorage();
                 renderProducts();
+                performSearch();
             }
         }
 
@@ -748,6 +749,7 @@
             saveToStorage();
             closeEditModal();
             renderProducts();
+            performSearch();
         }
 
         function deleteProduct() {
@@ -757,6 +759,7 @@
             saveToStorage();
             closeEditModal();
             renderProducts();
+            performSearch();
         }
 
         function loadPermanentProducts() {
@@ -802,6 +805,8 @@
         }
 
         function performSearch() {
+            if (!document.getElementById('search-modal').classList.contains('active')) return;
+
             const query = document.getElementById('search-input').value.trim();
             const resultsDiv = document.getElementById('search-results');
             
