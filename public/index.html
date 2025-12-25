@@ -301,6 +301,45 @@
                 color: #ff7a7a;
             }
         }
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container input {
+            padding-left: 70px !important;
+        }
+
+        .search-actions {
+            position: absolute;
+            left: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .search-action-btn {
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            color: #6b4c3b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .search-action-btn:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .search-action-btn svg {
+            width: 18px;
+            height: 18px;
+        }
     </style>
 </head>
 <body>
@@ -340,6 +379,9 @@
         </symbol>
         <symbol id="icon-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="m15 18-6-6 6-6"/>
+        </symbol>
+        <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
         </symbol>
     </svg>
 
@@ -423,8 +465,16 @@
         <div class="modal" onclick="event.stopPropagation()">
             <h2>חיפוש מוצר קיים</h2>
             
-            <div class="form-group">
+            <div class="form-group search-container">
                 <input type="text" id="search-input" placeholder="הקלד שם מוצר..." oninput="performSearch()" />
+                <div class="search-actions">
+                    <button class="search-action-btn" onclick="createProductFromSearch()" title="צור מוצר חדש">
+                        <svg><use href="#icon-circle-plus"></use></svg>
+                    </button>
+                    <button class="search-action-btn" onclick="clearSearch()" title="נקה חיפוש">
+                        <svg><use href="#icon-x"></use></svg>
+                    </button>
+                </div>
             </div>
 
             <div class="search-results" id="search-results"></div>
@@ -730,6 +780,25 @@
         function closeSearchModal() {
             document.getElementById('search-modal').classList.remove('active');
             popStateOfModal()
+        }
+        
+        function clearSearch() {
+            const input = document.getElementById('search-input');
+            input.value = '';
+            input.focus();
+            performSearch();
+        }
+
+        function createProductFromSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+            
+            closeSearchModal();
+
+            setTimeout(() => {
+                openCreateModal();
+                document.getElementById('product-name').value = query;
+            }, 200);
         }
 
         function performSearch() {
