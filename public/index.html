@@ -187,6 +187,8 @@
 
         .modal-overlay.active { display:flex; }
 
+        #edit-modal {z-index: 2000;}
+
         .modal {
             background:#fff;
             border-radius:12px;
@@ -513,6 +515,39 @@
         }
 
         // Render functions
+        function generateProductListHtml(grouped) {
+            return Object.keys(grouped).map(catId => {
+                const category = CATEGORIES.find(c => c.id === parseInt(catId));
+                const items = grouped[catId];
+                
+                return `
+                    <div class="category-group">
+                        <div class="category-header">
+                            <span class="category-name">${category.name}</span>
+                            <div class="category-line" style="background:${category.color}"></div>
+                        </div>
+                        ${items.map(p => `
+                            <div class="product-item ${p.isActive ? '' : 'inactive'}">
+                                <input type="checkbox" ${p.isActive ? '' : 'checked'} 
+                                       onchange="toggleActive(${p.id})" />
+                                <div class="product-name ${p.isUnurgent ? 'urgent' : ''}">
+                                    <span>${p.name}${p.quantity ? ` (${p.quantity})` : ''}</span>
+                                </div>
+                            <div class="icon-group">
+                                ${p.isUnurgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
+                                ${p.isPermanent ? '<svg><use href="#icon-repeat2"></use></svg>' : ''}
+                                ${p.isUnurgent || p.isPermanent? '<svg id="iconLine"><use href="#icon-line"></use></svg>' : ''}
+                                <button class="edit-btn" onclick="openEditModal(${p.id})">
+                                    <svg><use href="#icon-pencil"></use></svg>
+                                </button>
+                            </div>
+                            </div>
+                        `).join('')}
+                        </div>
+                `;
+            }).join('');
+        }
+
         function renderProducts() {
             const filtered = products.filter(p => p.isActive === showingActive);
             const sorted = sortProducts(filtered);
@@ -523,36 +558,7 @@
             if (sorted.length === 0) {
                 container.innerHTML = '<div class="empty-state">אין מוצרים ברשימה</div>';
             } else {
-                container.innerHTML = Object.keys(grouped).map(catId => {
-                    const category = CATEGORIES.find(c => c.id === parseInt(catId));
-                    const items = grouped[catId];
-                    
-                    return `
-                        <div class="category-group">
-                            <div class="category-header">
-                                <span class="category-name">${category.name}</span>
-                                <div class="category-line" style="background:${category.color}"></div>
-                            </div>
-                            ${items.map(p => `
-                                <div class="product-item ${p.isActive ? '' : 'inactive'}">
-                                    <input type="checkbox" ${p.isActive ? '' : 'checked'} 
-                                           onchange="toggleActive(${p.id})" />
-                                    <div class="product-name ${p.isUnurgent ? 'urgent' : ''}">
-                                        <span>${p.name}${p.quantity ? ` (${p.quantity})` : ''}</span>
-                                    </div>
-                                <div class="icon-group">
-                                    ${p.isUnurgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
-                                    ${p.isPermanent ? '<svg><use href="#icon-repeat2"></use></svg>' : ''}
-                                    ${p.isUnurgent || p.isPermanent? '<svg id="iconLine"><use href="#icon-line"></use></svg>' : ''}
-                                    <button class="edit-btn" onclick="openEditModal(${p.id})">
-                                        <svg><use href="#icon-pencil"></use></svg>
-                                    </button>
-                                </div>
-                                </div>
-                            `).join('')}
-                            </div>
-                    `;
-                }).join('');
+                container.innerHTML = generateProductListHtml(grouped);
             }
             
             updateCounts();
@@ -747,32 +753,7 @@
             const sorted = sortProducts(filtered);
             const grouped = groupByCategory(sorted);
 
-            resultsDiv.innerHTML = Object.keys(grouped).map(catId => {
-                const category = CATEGORIES.find(c => c.id === parseInt(catId));
-                const items = grouped[catId];
-                
-                return `
-                    <div class="category-group">
-                        <div class="category-header">
-                            <span class="category-name">${category.name}</span>
-                            <div class="category-line" style="background:${category.color}"></div>
-                        </div>
-                        ${items.map(p => `
-                            <div class="product-item ${p.isActive && !p.isUnurgent ? '' : 'inactive'}">
-                                <input type="checkbox" ${p.isActive ? '' : 'checked'} 
-                                       onchange="toggleActive(${p.id})" />
-                                <div class="product-name">
-                                    ${p.name}${p.quantity ? ` (${p.quantity})` : ''}
-                                </div>
-                                <div class="icon-group">
-                                    ${p.isUnurgent ? '<svg><use href="#icon-moon"></use></svg>' : ''}
-                                    ${p.isPermanent ? '<svg><use href="#icon-repeat2"></use></svg>' : ''}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }).join('');
+            resultsDiv.innerHTML = generateProductListHtml(grouped);
         }
 
         function openMoreModal() {
