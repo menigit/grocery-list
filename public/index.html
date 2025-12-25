@@ -196,8 +196,10 @@
             width:100%;
             max-width:400px;
             max-height:90vh;
-            overflow:auto;
+            overflow:hidden;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
         }
 
         .modal h2 { margin:0 0 20px 0; font-size:20px; color:#6b4c3b; }
@@ -264,6 +266,13 @@
         .empty-state { text-align:center; padding:40px 20px; color:#a67c63; }
 
         .search-results .product-item { padding: 6px 10px; }
+        .search-results { 
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #dfb694 #eee9df;
+        }
 
         .action-btn.btn-more {flex:0.5;}
 
@@ -778,6 +787,7 @@
                 '<div class="empty-state">התחל להקליד לחיפוש מוצרים</div>';
             document.getElementById('search-modal').classList.add('active');
             pushStateForModal('search-modal');
+            setTimeout(() => document.getElementById('search-input').focus(), 100);
         }
 
         function closeSearchModal() {
